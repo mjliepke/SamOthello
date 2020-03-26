@@ -10,7 +10,18 @@ namespace SamOthellop
 {
     class PiecePanel : Panel
     {
-        public Color FillColor = Color.Black;
+        private Color FillColor = Color.Black;
+
+        public PiecePanel(Color fillColor) : base()
+        {
+            FillColor = fillColor;
+        }
+
+        public PiecePanel() : base()
+        {
+
+        }
+
         protected override void OnPaint(PaintEventArgs e)
         {
             Graphics g = e.Graphics;

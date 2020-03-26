@@ -61,7 +61,10 @@
             this.Load += new System.EventHandler(this.OthelloForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.othelloBoardBindingSource)).EndInit();
             this.ResumeLayout(false);
-
+            //
+            //Panels
+            //
+            //this._boardPanels[0, 0].Click += new System.EventHandler(this.OthelloPeice_Click);
         }
 
         #endregion

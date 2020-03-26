@@ -83,7 +83,7 @@ namespace SamOthellop
             }
             if(answer==true)
             {
-                return (outs[-1]);//can't do this in c#
+                return (outs[-1]);//can't do this in c# (multi-dimensional array)
             }
         }
 
@@ -91,14 +91,6 @@ namespace SamOthellop
     
   
 
-	
-
-	
-
-  
-
-
-  
 var back = function(expected){
   for(var i=0;i<outs[outs.length - 1].length;i++){
     delta[outs.length - 1][i]=(expected[i]-outs[outs.length - 1][i])* derivative(outs[outs.length - 1][i]);
@@ -401,4 +393,5 @@ for(var doit=0;doit<Infinity;doit++){
 
         
     }
+    
 }

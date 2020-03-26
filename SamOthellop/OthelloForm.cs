@@ -29,40 +29,49 @@ namespace SamOthellop
             {
                 for(int j = 0; j < _myBoard.BoardSize; j++)
                 {
-                    var newPanel = new PiecePanel
+                    var newPanel = new PiecePanel()
                     {
                         Size = new Size(tileSize, tileSize),
                         Location = new Point(tileSize * i, tileSize * j)
                     };
 
-                    // add to Form's Controls so that they show up
                     Controls.Add(newPanel);
-
-                    // add to our 2d array of panels for future use
                     _boardPanels[i, j] = newPanel;
-
-                    //color the backgrounds
                     Color panelcolor = Color.Red;
 
-                    if(_myBoard.BoardStateColors.TryGetValue(_myBoard.GetBoard()[i,j], out panelcolor))
+                    if(OthelloBoard.BoardStateColors.TryGetValue(_myBoard.GetBoard()[i,j], out panelcolor))
                     {
-                        _boardPanels[i, j].FillColor = panelcolor;
+                        _boardPanels[i, j].ReColor(panelcolor);
                     }
-                    
                 }
             }
+
+        }
+    
+        private void RefreshPanels()
+        {
+            for(int i = 0; i < _myBoard.BoardSize; i++)
+            {
+                for(int j=0; j<_myBoard.BoardSize; j++)
+                {
+                    Color color;
+                    OthelloBoard.BoardStateColors.TryGetValue(_myBoard.GetBoard()[i, j], out color);
+                    _boardPanels[i, j].ReColor(color);
+
+                }
+            }
+        }
+
+        private void OthelloPeice_Click(object sender, EventArgs e)
+        {
 
         }
 
         private void Button1_Click(object sender, EventArgs e)
         {
-            try
-            {
-                _boardPanels[0, 0].ReColor(Color.Red);
-            }
-            catch(Exception)
-            {
-            }
+
+            _myBoard.MakeMove(OthelloBoard.BoardStates.black, new int[] { 2,3});
+            RefreshPanels();
         }
     }
 }

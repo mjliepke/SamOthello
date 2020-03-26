@@ -58,7 +58,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SamCode.cs" />
+    <None Include="SamCode.cs" />
     <EmbeddedResource Include="OthelloForm.resx">
       <DependentUpon>OthelloForm.cs</DependentUpon>
     </EmbeddedResource>
