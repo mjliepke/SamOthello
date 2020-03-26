@@ -1,0 +1,9 @@
+C:\Users\mjlie\source\repos\SamOthellop\SamOthellop\bin\Release\SamOthellop.exe.config
+C:\Users\mjlie\source\repos\SamOthellop\SamOthellop\bin\Release\SamOthellop.exe
+C:\Users\mjlie\source\repos\SamOthellop\SamOthellop\bin\Release\SamOthellop.pdb
+C:\Users\mjlie\source\repos\SamOthellop\SamOthellop\obj\Release\SamOthellop.OthelloForm.resources
+C:\Users\mjlie\source\repos\SamOthellop\SamOthellop\obj\Release\SamOthellop.Properties.Resources.resources
+C:\Users\mjlie\source\repos\SamOthellop\SamOthellop\obj\Release\SamOthellop.csproj.GenerateResource.cache
+C:\Users\mjlie\source\repos\SamOthellop\SamOthellop\obj\Release\SamOthellop.csproj.CoreCompileInputs.cache
+C:\Users\mjlie\source\repos\SamOthellop\SamOthellop\obj\Release\SamOthellop.exe
+C:\Users\mjlie\source\repos\SamOthellop\SamOthellop\obj\Release\SamOthellop.pdb

@@ -77,42 +77,54 @@ namespace SamOthellop
 
         private int[,] TakesPieces(BoardStates player, int[] location)
         {
-            int[,] taken = new int[BoardSize-1,2];//array of all pieces to be flipped
+            int[,] taken = new int[(BoardSize-2)*3,2];//array of all pieces to be flipped
             int takenCount = 0;
 
             int minX = location[0] > 0 ? location[0] -1 : 0;
             int minY = location[1] > 0 ? location[1] -1 : 0;
-            int maxX = location[0] + 2 < BoardSize ? location[0] + 1 : BoardSize;
-            int maxY = location[1] + 2 < BoardSize ? location[1] + 1 : BoardSize;
+            int maxX = location[0] + 2 < BoardSize ? location[0] + 1 : BoardSize - 1;
+            int maxY = location[1] + 2 < BoardSize ? location[1] + 1 : BoardSize - 1;
 
             for (int x = minX; x <= maxX; x++)
             {
                 for (int y = minY; y <= maxY; y++)
                 {
-                    if((x != location[0] || y != location[1]) && Board[x, y].Equals(OpposingPlayer(player)))
+                    int[,] subtaken = new int[(BoardSize - 2), 2];
+                    int subtakenCount = 0;
+
+                    if ((x != location[0] || y != location[1]) && Board[x, y].Equals(OpposingPlayer(player)))
                     {
                         int[] direction = new int[] { x - location[0], y - location[1] };
                         if (direction[0] == 0 && direction[1] == 0) break; //Can't test current location.. infinite loop
 
-                        int[] searchedLocation = new int[] { x + direction[0], y + direction[1] };
+                        int[] searchedLocation = new int[] { x , y };
 
                         while (OnBoard(searchedLocation) && Board[searchedLocation[0], searchedLocation[1]].Equals(OpposingPlayer(player)))
                         {
-                            taken[takenCount, 0] = searchedLocation[0];
-                            taken[takenCount, 1] = searchedLocation[1];
-                            takenCount++;
+                            subtaken[subtakenCount, 0] = searchedLocation[0];
+                            subtaken[subtakenCount, 1] = searchedLocation[1];
+                            subtakenCount++;
                             searchedLocation[0] += direction[0];
                             searchedLocation[1] += direction[1];
                 
                         }
 
-                        if(OnBoard(searchedLocation) && Board[searchedLocation[0], searchedLocation[1]].Equals(player))
+                        if(OnBoard(searchedLocation) && Board[searchedLocation[0], searchedLocation[1]].Equals(BoardStates.empty))
                         {
-                            taken[takenCount, 0] = searchedLocation[0] - direction[0];
-                            taken[takenCount, 1] = searchedLocation[1] - direction[1];
-                            takenCount++;
+                            // taken[takenCount, 0] = searchedLocation[0] - direction[0];
+                            // taken[takenCount, 1] = searchedLocation[1] - direction[1];
+                            // takenCount++;
+
+                            subtakenCount = 0;
                         }
                     }
+
+                    for(int i=0;i<subtakenCount; i++)
+                    {
+                        taken[i + takenCount, 0] = subtaken[i, 0];
+                        taken[i + takenCount, 1] = subtaken[i, 1];
+                    }
+                    takenCount += subtakenCount;
                 }
             }
 

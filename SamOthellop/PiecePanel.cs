@@ -11,6 +11,9 @@ namespace SamOthellop
     class PiecePanel : Panel
     {
         private Color FillColor = Color.Black;
+        public int[] location{
+            get;private set;
+        }
 
         public PiecePanel(Color fillColor) : base()
         {
@@ -20,6 +23,10 @@ namespace SamOthellop
         public PiecePanel() : base()
         {
 
+        }
+        public PiecePanel(int[] location) : base()
+        {
+            this.location = new int[] { location[0], location[1] };
         }
 
         protected override void OnPaint(PaintEventArgs e)

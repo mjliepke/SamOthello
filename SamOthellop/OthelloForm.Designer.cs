@@ -28,48 +28,36 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.othelloBoardBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.testButton = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.othelloBoardBindingSource)).BeginInit();
+            this.InstructionBrowser = new System.Windows.Forms.WebBrowser();
             this.SuspendLayout();
             // 
-            // othelloBoardBindingSource
+            // InstructionBrowser
             // 
-            this.othelloBoardBindingSource.DataSource = typeof(SamOthellop.OthelloBoard);
-            // 
-            // testButton
-            // 
-            this.testButton.Dock = System.Windows.Forms.DockStyle.Right;
-            this.testButton.Location = new System.Drawing.Point(663, 0);
-            this.testButton.Name = "testButton";
-            this.testButton.Size = new System.Drawing.Size(21, 461);
-            this.testButton.TabIndex = 0;
-            this.testButton.Text = "HIT ME";
-            this.testButton.UseVisualStyleBackColor = true;
-            this.testButton.Click += new System.EventHandler(this.Button1_Click);
+            this.InstructionBrowser.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.InstructionBrowser.Location = new System.Drawing.Point(517, 0);
+            this.InstructionBrowser.MinimumSize = new System.Drawing.Size(20, 20);
+            this.InstructionBrowser.Name = "InstructionBrowser";
+            this.InstructionBrowser.Size = new System.Drawing.Size(267, 475);
+            this.InstructionBrowser.TabIndex = 0;
             // 
             // OthelloForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(684, 461);
-            this.Controls.Add(this.testButton);
+            this.ClientSize = new System.Drawing.Size(784, 475);
+            this.Controls.Add(this.InstructionBrowser);
             this.Name = "OthelloForm";
             this.Text = "Othello";
             this.Load += new System.EventHandler(this.OthelloForm_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.othelloBoardBindingSource)).EndInit();
             this.ResumeLayout(false);
-            //
-            //Panels
-            //
-            //this._boardPanels[0, 0].Click += new System.EventHandler(this.OthelloPeice_Click);
+
         }
 
         #endregion
-        private System.Windows.Forms.BindingSource othelloBoardBindingSource;
-        private System.Windows.Forms.Button testButton;
+
+        private System.Windows.Forms.WebBrowser InstructionBrowser;
     }
 }
 
