@@ -15,22 +15,25 @@ namespace SamOthellop
     {
         private OthelloBoard _myBoard;
         private PiecePanel[,] _boardPanels;
+        private System.Timers.Timer _twoSecondTimer;
+
         public OthelloForm()
         {
             InitializeComponent();
+            _twoSecondTimer = new System.Timers.Timer(2000);
         }
 
         private void OthelloForm_Load(object sender, EventArgs e)
         {
             SetupBoard();
-            string curDir = Directory.GetCurrentDirectory();
-            InstructionBrowser.Navigate(new Uri(String.Format("file:///{0}/Instructions.html", curDir)));
+            SetupInstructions();
+            SetupProgressBar();
         }
         private void SetupBoard()
         {
             _myBoard = new OthelloBoard();
             _boardPanels = new PiecePanel[_myBoard.BoardSize, _myBoard.BoardSize];
-            int tileSize = ((Size.Width > Size.Height) ? Size.Height - 2 : Size.Width - 2) / _myBoard.BoardSize;
+            int tileSize = ((Size.Width > Size.Height) ? Size.Height - 45 : Size.Width - 45) / _myBoard.BoardSize;
 
             for (int i = 0; i < _myBoard.BoardSize; i++)
             {
@@ -55,6 +58,19 @@ namespace SamOthellop
             }
         }
     
+        private void SetupInstructions()
+        {
+            string curDir = Directory.GetCurrentDirectory();
+            InstructionBrowser.Navigate(new Uri(String.Format("file:///{0}/Instructions.html", curDir)));
+
+        }
+
+        private void SetupProgressBar()
+        {
+            GameCompletionProgressBar.Maximum = _myBoard.MaxMoves;
+            GameCompletionProgressBar.Value = _myBoard.PlayesMade();
+        }
+
         private void RefreshPanels()
         {
             for(int i = 0; i < _myBoard.BoardSize; i++)
@@ -75,12 +91,42 @@ namespace SamOthellop
             try
             {
                 PiecePanel thisPanel = (PiecePanel)sender;
+                if (!player.Equals(_myBoard.WhosTurn))
+                {
+                    if (player.Equals(OthelloBoard.BoardStates.white))
+                    {
+                        BlackMoveLabel.Visible = true;
+                        _twoSecondTimer.Elapsed += new System.Timers.ElapsedEventHandler(BlackMoveLabel_VisibilityFalse);
+                        _twoSecondTimer.Enabled = true;
+                    }else if (player.Equals(OthelloBoard.BoardStates.black))
+                    {
+                        WhiteMoveLabel.Visible = true;
 
+                        _twoSecondTimer.Elapsed += new System.Timers.ElapsedEventHandler(WhiteMoveLabel_VisibilityFalse);
+                        _twoSecondTimer.Enabled = true;
+                    }
+                }
                 _myBoard.MakeMove(player, new int[] { thisPanel.location[0], thisPanel.location[1] });
                 RefreshPanels();
             }catch{
                 throw new NotSupportedException("OthelloPeice_Click is not to be used with a control other than a PiecePanel");
             }
+            GameCompletionProgressBar.Value = _myBoard.PlayesMade();
+        }
+
+        private void BlackMoveLabel_VisibilityFalse(object sender, EventArgs e)
+        {
+            Invoke(new Action(() =>
+            {
+                BlackMoveLabel.Visible = false;
+            }));
+        }
+        private void WhiteMoveLabel_VisibilityFalse(object sender, EventArgs e)
+        {
+            Invoke(new Action(() =>
+            {
+                WhiteMoveLabel.Visible = false;
+            }));
         }
 
     }

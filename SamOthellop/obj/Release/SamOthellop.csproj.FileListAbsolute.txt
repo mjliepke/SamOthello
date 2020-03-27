@@ -7,3 +7,4 @@ C:\Users\mjlie\source\repos\SamOthellop\SamOthellop\obj\Release\SamOthellop.cspr
 C:\Users\mjlie\source\repos\SamOthellop\SamOthellop\obj\Release\SamOthellop.csproj.CoreCompileInputs.cache
 C:\Users\mjlie\source\repos\SamOthellop\SamOthellop\obj\Release\SamOthellop.exe
 C:\Users\mjlie\source\repos\SamOthellop\SamOthellop\obj\Release\SamOthellop.pdb
+C:\Users\mjlie\source\repos\SamOthellop\SamOthellop\bin\Release\Instructions.html

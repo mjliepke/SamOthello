@@ -22,17 +22,16 @@ namespace SamOthellop
             {BoardStates.empty, System.Drawing.Color.DarkOliveGreen }
         };
 
-        public int BoardSize
-        {
-            get; private set;
-        }
-
+        public int BoardSize {get; private set;}
+        public int MaxMoves { get; private set; }
+        public BoardStates WhosTurn { get; private set; }
         BoardStates[,] Board;
 
         public OthelloBoard(int boardsize = 8)
         {
-            
             SetupBoard(boardsize);
+            WhosTurn = BoardStates.black;
+            MaxMoves = (boardsize * boardsize) - 4;//4 preoccupied spaces
         }
 
         public BoardStates[,] GetBoard()
@@ -40,27 +39,53 @@ namespace SamOthellop
             return (BoardStates[,])Board.Clone();
         }
 
+        public BoardStates OpposingPlayer(BoardStates Player)
+        {
+            return (Player.Equals(BoardStates.white) ? BoardStates.black : BoardStates.white);
+        }
+
+        public bool GameOver()
+        {
+            bool over = false;
+            for(int i=0; i< BoardSize; i++)
+            {
+                for(int j=0; j<BoardSize; j++)
+                {
+                    over |= ValidMove(BoardStates.black, new int[] { i, j });
+                    over |= ValidMove(BoardStates.white, new int[] { i, j });
+                    if (over) break;
+                }
+            }
+            return over;
+        }
+
+        public int PlayesMade()
+        {
+            int playCount = -4; // Board Starts with 4 peices in play
+            foreach(BoardStates piece in Board){
+                playCount += Convert.ToInt32(!piece.Equals(BoardStates.empty));
+            }
+            return playCount;
+        }
+
         public void MakeMove(BoardStates player, int[] location){
             bool valid = true;
 
             valid &= OnBoard(location);
             valid &= Board[location[0], location[1]].Equals(BoardStates.empty);
+            valid &= WhosTurn.Equals(player);
             int[,] takenPieces = TakesPieces(player, location);
             valid &= takenPieces.Length > 0;
 
             if (valid)
-            {//make everything between location & direction of nearest match swap
+            { 
                 Board[location[0], location[1]] = player;
                 for (int i=0; i<takenPieces.GetLength(0); i++)
                 {
                     Board[takenPieces[i, 0], takenPieces[i, 1]] = player;
                 }
+                WhosTurn = OpposingPlayer(player);
             }
-        }
-
-        public BoardStates OpposingPlayer(BoardStates Player)
-        {
-            return (Player.Equals(BoardStates.white) ? BoardStates.black : BoardStates.white);
         }
 
         public bool ValidMove(BoardStates player, int[] location)
@@ -69,11 +94,14 @@ namespace SamOthellop
 
             valid &= OnBoard(location);
             valid &= Board[location[0], location[1]].Equals(BoardStates.empty);
+            valid &= WhosTurn.Equals(player);
             int[,] takenPieces = TakesPieces(player, location);
             valid &= takenPieces.Length > 0;
 
             return valid;
         }
+
+        //**********************Private Methods************************
 
         private int[,] TakesPieces(BoardStates player, int[] location)
         {
@@ -95,7 +123,7 @@ namespace SamOthellop
                     if ((x != location[0] || y != location[1]) && Board[x, y].Equals(OpposingPlayer(player)))
                     {
                         int[] direction = new int[] { x - location[0], y - location[1] };
-                        if (direction[0] == 0 && direction[1] == 0) break; //Can't test current location.. infinite loop
+                       // if (direction[0] == 0 && direction[1] == 0) break; //Can't test current location.. infinite loop
 
                         int[] searchedLocation = new int[] { x , y };
 
@@ -109,12 +137,8 @@ namespace SamOthellop
                 
                         }
 
-                        if(OnBoard(searchedLocation) && Board[searchedLocation[0], searchedLocation[1]].Equals(BoardStates.empty))
+                        if(!OnBoard(searchedLocation) || Board[searchedLocation[0], searchedLocation[1]].Equals(BoardStates.empty))
                         {
-                            // taken[takenCount, 0] = searchedLocation[0] - direction[0];
-                            // taken[takenCount, 1] = searchedLocation[1] - direction[1];
-                            // takenCount++;
-
                             subtakenCount = 0;
                         }
                     }
