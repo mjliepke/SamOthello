@@ -22,15 +22,14 @@ namespace SamOthellop
             {BoardStates.empty, System.Drawing.Color.DarkOliveGreen }
         };
 
-        public int BoardSize {get; private set;}
+        public int BoardSize { get; private set; }
         public int MaxMoves { get; private set; }
         public BoardStates WhosTurn { get; private set; }
         BoardStates[,] Board;
 
         public OthelloBoard(int boardsize = 8)
         {
-            SetupBoard(boardsize);
-            WhosTurn = BoardStates.black;
+            SetupGame(boardsize);
             MaxMoves = (boardsize * boardsize) - 4;//4 preoccupied spaces
         }
 
@@ -39,36 +38,67 @@ namespace SamOthellop
             return (BoardStates[,])Board.Clone();
         }
 
+        public int[,] GetBoardArray()
+        {
+            int[,] arrayRepresentation = new int[BoardSize, BoardSize];
+            for (int i = 0; i < BoardSize; i++)
+            {
+                for (int j = 0; j < BoardSize; j++)
+                {
+                    arrayRepresentation[i, j] = (int)(Board[i, j]);
+                }
+            }
+            return arrayRepresentation;
+        }
+
         public BoardStates OpposingPlayer(BoardStates Player)
         {
             return (Player.Equals(BoardStates.white) ? BoardStates.black : BoardStates.white);
         }
 
-        public bool GameOver()
+        public int MaxMovesLeft()
+        ///Returns max moves left if all pieces are played
         {
-            bool over = false;
-            for(int i=0; i< BoardSize; i++)
-            {
-                for(int j=0; j<BoardSize; j++)
-                {
-                    over |= ValidMove(BoardStates.black, new int[] { i, j });
-                    over |= ValidMove(BoardStates.white, new int[] { i, j });
-                    if (over) break;
-                }
-            }
-            return over;
+            return (MaxMoves - MovesMade());
         }
 
-        public int PlayesMade()
+        public bool GameOver()
+        {
+            bool moveExists = false;
+            //for debugging:
+            int i, j;
+            for (i = 0; i < BoardSize; i++)
+            {
+                for (j = 0; j < BoardSize; j++)
+                {
+                    moveExists |= ValidMove(BoardStates.black, new int[] { i, j });
+                    moveExists |= ValidMove(BoardStates.white, new int[] { i, j });
+                    if (moveExists)
+                    {
+                        break;
+                    }
+                }
+            }
+            return !moveExists;
+        }
+
+        public void ResetBoard()
+        {
+            SetupGame(BoardSize);
+        }
+
+        public int MovesMade()
         {
             int playCount = -4; // Board Starts with 4 peices in play
-            foreach(BoardStates piece in Board){
-                playCount += Convert.ToInt32(!piece.Equals(BoardStates.empty));
+            foreach (BoardStates piece in Board)
+            {
+                if (!piece.Equals(BoardStates.empty)) playCount++;
             }
             return playCount;
         }
 
-        public void MakeMove(BoardStates player, int[] location){
+        public void MakeMove(BoardStates player, int[] location)
+        {
             bool valid = true;
 
             valid &= OnBoard(location);
@@ -78,9 +108,9 @@ namespace SamOthellop
             valid &= takenPieces.Length > 0;
 
             if (valid)
-            { 
+            {
                 Board[location[0], location[1]] = player;
-                for (int i=0; i<takenPieces.GetLength(0); i++)
+                for (int i = 0; i < takenPieces.GetLength(0); i++)
                 {
                     Board[takenPieces[i, 0], takenPieces[i, 1]] = player;
                 }
@@ -88,13 +118,51 @@ namespace SamOthellop
             }
         }
 
-        public bool ValidMove(BoardStates player, int[] location)
+        public void MakeRandomMove(BoardStates player)
+        {
+            int[,] possibleMoves = new int[MaxMoves - MovesMade(), 2];
+            int possibleMoveCount = 0;
+            for (int i = 0; i < BoardSize; i++)
+            {
+                for (int j = 0; j < BoardSize; j++)
+                {
+                    if (ValidMove(player, new int[] { i, j }))
+                    {
+                        possibleMoves[possibleMoveCount, 0] = i;
+                        possibleMoves[possibleMoveCount, 1] = j;
+                        possibleMoveCount++;
+                    }
+                }
+            }
+            if (possibleMoveCount == 0)
+            {
+                WhosTurn = OpposingPlayer(WhosTurn);
+                return;
+            }
+            Random rndGenerator = new Random();
+            int rnd = (int)Math.Floor(rndGenerator.NextDouble() * possibleMoveCount);
+
+            MakeMove(player, new int[] { possibleMoves[rnd, 0], possibleMoves[rnd, 1] });
+        }
+
+        public void MakeRandomMove()
+        {
+            int moves = MovesMade();
+            BoardStates player1 = WhosTurn;
+            MakeRandomMove(WhosTurn);
+            if (moves == MovesMade())//will happen when play does not have move & faults to next
+            {
+                MakeRandomMove(WhosTurn);
+            }
+        }
+
+        public bool ValidMove(BoardStates player, int[] location, bool playerTurn = false)
         {
             bool valid = true;
 
             valid &= OnBoard(location);
             valid &= Board[location[0], location[1]].Equals(BoardStates.empty);
-            valid &= WhosTurn.Equals(player);
+            if (playerTurn) valid &= WhosTurn.Equals(player);
             int[,] takenPieces = TakesPieces(player, location);
             valid &= takenPieces.Length > 0;
 
@@ -105,11 +173,11 @@ namespace SamOthellop
 
         private int[,] TakesPieces(BoardStates player, int[] location)
         {
-            int[,] taken = new int[(BoardSize-2)*3,2];//array of all pieces to be flipped
+            int[,] taken = new int[(BoardSize - 2) * 3, 2];//array of all pieces to be flipped
             int takenCount = 0;
 
-            int minX = location[0] > 0 ? location[0] -1 : 0;
-            int minY = location[1] > 0 ? location[1] -1 : 0;
+            int minX = location[0] > 0 ? location[0] - 1 : 0;
+            int minY = location[1] > 0 ? location[1] - 1 : 0;
             int maxX = location[0] + 2 < BoardSize ? location[0] + 1 : BoardSize - 1;
             int maxY = location[1] + 2 < BoardSize ? location[1] + 1 : BoardSize - 1;
 
@@ -117,15 +185,15 @@ namespace SamOthellop
             {
                 for (int y = minY; y <= maxY; y++)
                 {
-                    int[,] subtaken = new int[(BoardSize - 2), 2];
+                    int[,] subtaken = new int[BoardSize, 2];
                     int subtakenCount = 0;
 
                     if ((x != location[0] || y != location[1]) && Board[x, y].Equals(OpposingPlayer(player)))
                     {
                         int[] direction = new int[] { x - location[0], y - location[1] };
-                       // if (direction[0] == 0 && direction[1] == 0) break; //Can't test current location.. infinite loop
+                        // if (direction[0] == 0 && direction[1] == 0) break; //Can't test current location.. infinite loop
 
-                        int[] searchedLocation = new int[] { x , y };
+                        int[] searchedLocation = new int[] { x, y };
 
                         while (OnBoard(searchedLocation) && Board[searchedLocation[0], searchedLocation[1]].Equals(OpposingPlayer(player)))
                         {
@@ -134,16 +202,16 @@ namespace SamOthellop
                             subtakenCount++;
                             searchedLocation[0] += direction[0];
                             searchedLocation[1] += direction[1];
-                
+
                         }
 
-                        if(!OnBoard(searchedLocation) || Board[searchedLocation[0], searchedLocation[1]].Equals(BoardStates.empty))
+                        if (!OnBoard(searchedLocation) || Board[searchedLocation[0], searchedLocation[1]].Equals(BoardStates.empty))
                         {
                             subtakenCount = 0;
                         }
                     }
 
-                    for(int i=0;i<subtakenCount; i++)
+                    for (int i = 0; i < subtakenCount; i++)
                     {
                         taken[i + takenCount, 0] = subtaken[i, 0];
                         taken[i + takenCount, 1] = subtaken[i, 1];
@@ -153,7 +221,7 @@ namespace SamOthellop
             }
 
             int[,] trimmedTaken = new int[takenCount, 2];
-            for(int i=0;i<takenCount; i++)
+            for (int i = 0; i < takenCount; i++)
             {
                 trimmedTaken[i, 0] = taken[i, 0];
                 trimmedTaken[i, 1] = taken[i, 1];
@@ -161,13 +229,13 @@ namespace SamOthellop
             return trimmedTaken;
         }
 
-        private void SetupBoard(int boardsize)
+        private void SetupGame(int boardsize)
         {
             BoardSize = boardsize;
             Board = new BoardStates[boardsize, boardsize];
-            for(int i=0; i<BoardSize; i++)
+            for (int i = 0; i < BoardSize; i++)
             {
-                for(int j=0; j<BoardSize; j++)
+                for (int j = 0; j < BoardSize; j++)
                 {
                     Board[i, j] = BoardStates.empty;
                 }
@@ -176,6 +244,8 @@ namespace SamOthellop
             Board[BoardSize / 2 - 1, BoardSize / 2] = BoardStates.black;
             Board[BoardSize / 2, BoardSize / 2 - 1] = BoardStates.black;
             Board[BoardSize / 2, BoardSize / 2] = BoardStates.white;
+
+            WhosTurn = BoardStates.black;
         }
 
         private bool OnBoard(int[] location)

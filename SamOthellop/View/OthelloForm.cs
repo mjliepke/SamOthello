@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -57,7 +58,7 @@ namespace SamOthellop
                 }
             }
         }
-    
+
         private void SetupInstructions()
         {
             string curDir = Directory.GetCurrentDirectory();
@@ -68,14 +69,14 @@ namespace SamOthellop
         private void SetupProgressBar()
         {
             GameCompletionProgressBar.Maximum = _myBoard.MaxMoves;
-            GameCompletionProgressBar.Value = _myBoard.PlayesMade();
+            GameCompletionProgressBar.Value = _myBoard.MovesMade();
         }
 
-        private void RefreshPanels()
+        private void RefreshControls()
         {
-            for(int i = 0; i < _myBoard.BoardSize; i++)
+            for (int i = 0; i < _myBoard.BoardSize; i++)
             {
-                for(int j=0; j<_myBoard.BoardSize; j++)
+                for (int j = 0; j < _myBoard.BoardSize; j++)
                 {
                     Color color;
                     OthelloBoard.BoardStateColors.TryGetValue(_myBoard.GetBoard()[i, j], out color);
@@ -83,11 +84,18 @@ namespace SamOthellop
 
                 }
             }
+
+            if (_myBoard.GameOver())
+            {
+                GameOverLabel.Visible = true;
+                _twoSecondTimer.Elapsed += new System.Timers.ElapsedEventHandler(GameOver_VisibilityFalse);
+                _twoSecondTimer.Enabled = true;
+            }
         }
 
         private void OthelloPeice_Click(object sender, MouseEventArgs e)
         {
-            OthelloBoard.BoardStates player  = e.Button ==MouseButtons.Left ? OthelloBoard.BoardStates.black : OthelloBoard.BoardStates.white;
+            OthelloBoard.BoardStates player = e.Button == MouseButtons.Left ? OthelloBoard.BoardStates.black : OthelloBoard.BoardStates.white;
             try
             {
                 PiecePanel thisPanel = (PiecePanel)sender;
@@ -98,7 +106,8 @@ namespace SamOthellop
                         BlackMoveLabel.Visible = true;
                         _twoSecondTimer.Elapsed += new System.Timers.ElapsedEventHandler(BlackMoveLabel_VisibilityFalse);
                         _twoSecondTimer.Enabled = true;
-                    }else if (player.Equals(OthelloBoard.BoardStates.black))
+                    }
+                    else if (player.Equals(OthelloBoard.BoardStates.black))
                     {
                         WhiteMoveLabel.Visible = true;
 
@@ -107,11 +116,13 @@ namespace SamOthellop
                     }
                 }
                 _myBoard.MakeMove(player, new int[] { thisPanel.location[0], thisPanel.location[1] });
-                RefreshPanels();
-            }catch{
+                RefreshControls();
+            }
+            catch
+            {
                 throw new NotSupportedException("OthelloPeice_Click is not to be used with a control other than a PiecePanel");
             }
-            GameCompletionProgressBar.Value = _myBoard.PlayesMade();
+            GameCompletionProgressBar.Value = _myBoard.MovesMade();
         }
 
         private void BlackMoveLabel_VisibilityFalse(object sender, EventArgs e)
@@ -121,6 +132,7 @@ namespace SamOthellop
                 BlackMoveLabel.Visible = false;
             }));
         }
+
         private void WhiteMoveLabel_VisibilityFalse(object sender, EventArgs e)
         {
             Invoke(new Action(() =>
@@ -129,5 +141,92 @@ namespace SamOthellop
             }));
         }
 
+        private void GameOver_VisibilityFalse(object sender, EventArgs e)
+        {
+            Invoke(new Action(() =>
+            {
+                GameOverLabel.Visible = false;
+            }));
+        }
+
+        private void GameCountTextBox_ColorControl(object sender, EventArgs e)
+        {
+            GameCountTextBox.BackColor = SystemColors.Control;
+        }
+
+        private void RandomMoveButton_Click(object sender, EventArgs e)
+        {
+            _myBoard.MakeRandomMove();
+            RefreshControls();
+        }
+
+        private void RandomGameButton_Click(object sender, EventArgs e)
+        {
+            EnableControlButtons(false);
+            new Thread(() =>
+            {
+                while (!_myBoard.GameOver())
+                {
+                    _myBoard.MakeRandomMove();
+                }
+                Invoke(new Action(() =>
+                {
+                    RefreshControls();
+                    EnableControlButtons();
+                }));
+            }).Start();
+        }
+
+        private void ClearBoardButton_Click(object sender, EventArgs e)
+        {
+            _myBoard.ResetBoard();
+            GameOverLabel.Visible = false;
+            RefreshControls();
+        }
+
+        private void RunGamesButton_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < GameCountTextBox.Text.Length; i++)
+            {
+                if (!char.IsNumber((char)(GameCountTextBox.Text[i])))
+                {
+                    GameCountTextBox.BackColor = Color.Red;
+                    _twoSecondTimer.Elapsed += new System.Timers.ElapsedEventHandler(GameCountTextBox_ColorControl);
+                    _twoSecondTimer.Enabled = true;
+                    return;
+                }
+            }
+
+            int gameCount = Convert.ToInt32(GameCountTextBox.Text);
+            EnableControlButtons(false);
+
+            new Thread(() =>
+            {
+                for (int i = 0; i < gameCount; i++)
+                {
+                    while (!_myBoard.GameOver())
+                    {
+                        _myBoard.MakeRandomMove();
+                    }
+                    Invoke(new Action(() =>
+                    {
+                        RefreshControls();
+                        EnableControlButtons();
+                    }));
+                    _myBoard.ResetBoard();
+                    Thread.Sleep(5);
+                }
+            }).Start();
+
+
+
+        }
+        private void EnableControlButtons(bool enable = true)
+        {
+            RandomGameButton.Enabled = enable;
+            RunGamesButton.Enabled = enable;
+            RandomMoveButton.Enabled = enable;
+        }
     }
 }
+
