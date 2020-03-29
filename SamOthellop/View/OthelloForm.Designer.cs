@@ -30,6 +30,10 @@
         {
             this.InstructionBrowser = new System.Windows.Forms.WebBrowser();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.RunNetButton = new System.Windows.Forms.Button();
+            this.GameCountTextBox = new System.Windows.Forms.TextBox();
+            this.RunGamesButton = new System.Windows.Forms.Button();
+            this.ClearBoardButton = new System.Windows.Forms.Button();
             this.RandomGameButton = new System.Windows.Forms.Button();
             this.RandomMoveButton = new System.Windows.Forms.Button();
             this.BlackMoveLabel = new System.Windows.Forms.Label();
@@ -38,9 +42,8 @@
             this.gameProgressLabel = new System.Windows.Forms.Label();
             this.GameCompletionProgressBar = new System.Windows.Forms.ProgressBar();
             this.GameOverLabel = new System.Windows.Forms.Label();
-            this.ClearBoardButton = new System.Windows.Forms.Button();
-            this.RunGamesButton = new System.Windows.Forms.Button();
-            this.GameCountTextBox = new System.Windows.Forms.TextBox();
+            this.EducatedPlayButton = new System.Windows.Forms.Button();
+            this.MoveDepth = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -56,6 +59,9 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.MoveDepth);
+            this.groupBox1.Controls.Add(this.EducatedPlayButton);
+            this.groupBox1.Controls.Add(this.RunNetButton);
             this.groupBox1.Controls.Add(this.GameCountTextBox);
             this.groupBox1.Controls.Add(this.RunGamesButton);
             this.groupBox1.Controls.Add(this.ClearBoardButton);
@@ -75,23 +81,62 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = " ";
             // 
+            // RunNetButton
+            // 
+            this.RunNetButton.Location = new System.Drawing.Point(170, 312);
+            this.RunNetButton.Name = "RunNetButton";
+            this.RunNetButton.Size = new System.Drawing.Size(103, 20);
+            this.RunNetButton.TabIndex = 12;
+            this.RunNetButton.Text = "Run Neural Net";
+            this.RunNetButton.UseVisualStyleBackColor = true;
+            this.RunNetButton.Click += new System.EventHandler(this.Button1_Click);
+            // 
+            // GameCountTextBox
+            // 
+            this.GameCountTextBox.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
+            this.GameCountTextBox.Location = new System.Drawing.Point(18, 390);
+            this.GameCountTextBox.MaxLength = 4;
+            this.GameCountTextBox.Name = "GameCountTextBox";
+            this.GameCountTextBox.Size = new System.Drawing.Size(35, 20);
+            this.GameCountTextBox.TabIndex = 11;
+            // 
+            // RunGamesButton
+            // 
+            this.RunGamesButton.Location = new System.Drawing.Point(50, 390);
+            this.RunGamesButton.Name = "RunGamesButton";
+            this.RunGamesButton.Size = new System.Drawing.Size(71, 20);
+            this.RunGamesButton.TabIndex = 10;
+            this.RunGamesButton.Text = "Run Games";
+            this.RunGamesButton.UseVisualStyleBackColor = true;
+            this.RunGamesButton.Click += new System.EventHandler(this.RunGamesButton_Click);
+            // 
+            // ClearBoardButton
+            // 
+            this.ClearBoardButton.Location = new System.Drawing.Point(18, 364);
+            this.ClearBoardButton.Name = "ClearBoardButton";
+            this.ClearBoardButton.Size = new System.Drawing.Size(103, 20);
+            this.ClearBoardButton.TabIndex = 9;
+            this.ClearBoardButton.Text = "Clear Board";
+            this.ClearBoardButton.UseVisualStyleBackColor = true;
+            this.ClearBoardButton.Click += new System.EventHandler(this.ClearBoardButton_Click);
+            // 
             // RandomGameButton
             // 
-            this.RandomGameButton.Location = new System.Drawing.Point(89, 352);
+            this.RandomGameButton.Location = new System.Drawing.Point(18, 338);
             this.RandomGameButton.Name = "RandomGameButton";
-            this.RandomGameButton.Size = new System.Drawing.Size(132, 20);
+            this.RandomGameButton.Size = new System.Drawing.Size(103, 20);
             this.RandomGameButton.TabIndex = 8;
-            this.RandomGameButton.Text = "Play Random Game";
+            this.RandomGameButton.Text = "Random Game";
             this.RandomGameButton.UseVisualStyleBackColor = true;
             this.RandomGameButton.Click += new System.EventHandler(this.RandomGameButton_Click);
             // 
             // RandomMoveButton
             // 
-            this.RandomMoveButton.Location = new System.Drawing.Point(89, 326);
+            this.RandomMoveButton.Location = new System.Drawing.Point(18, 312);
             this.RandomMoveButton.Name = "RandomMoveButton";
-            this.RandomMoveButton.Size = new System.Drawing.Size(132, 20);
+            this.RandomMoveButton.Size = new System.Drawing.Size(103, 20);
             this.RandomMoveButton.TabIndex = 7;
-            this.RandomMoveButton.Text = "Make Random Move";
+            this.RandomMoveButton.Text = "Random Move";
             this.RandomMoveButton.UseVisualStyleBackColor = true;
             this.RandomMoveButton.Click += new System.EventHandler(this.RandomMoveButton_Click);
             // 
@@ -99,7 +144,7 @@
             // 
             this.BlackMoveLabel.AutoSize = true;
             this.BlackMoveLabel.BackColor = System.Drawing.Color.Yellow;
-            this.BlackMoveLabel.Location = new System.Drawing.Point(191, 301);
+            this.BlackMoveLabel.Location = new System.Drawing.Point(201, 281);
             this.BlackMoveLabel.Name = "BlackMoveLabel";
             this.BlackMoveLabel.Size = new System.Drawing.Size(90, 13);
             this.BlackMoveLabel.TabIndex = 6;
@@ -110,7 +155,7 @@
             // 
             this.InvalidMoveLabel.AutoSize = true;
             this.InvalidMoveLabel.BackColor = System.Drawing.Color.Red;
-            this.InvalidMoveLabel.Location = new System.Drawing.Point(117, 301);
+            this.InvalidMoveLabel.Location = new System.Drawing.Point(127, 281);
             this.InvalidMoveLabel.Name = "InvalidMoveLabel";
             this.InvalidMoveLabel.Size = new System.Drawing.Size(68, 13);
             this.InvalidMoveLabel.TabIndex = 5;
@@ -122,7 +167,7 @@
             this.WhiteMoveLabel.AutoSize = true;
             this.WhiteMoveLabel.BackColor = System.Drawing.Color.Yellow;
             this.WhiteMoveLabel.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.WhiteMoveLabel.Location = new System.Drawing.Point(20, 301);
+            this.WhiteMoveLabel.Location = new System.Drawing.Point(30, 281);
             this.WhiteMoveLabel.Name = "WhiteMoveLabel";
             this.WhiteMoveLabel.Size = new System.Drawing.Size(91, 13);
             this.WhiteMoveLabel.TabIndex = 3;
@@ -158,34 +203,24 @@
             this.GameOverLabel.Text = "GAME OVER";
             this.GameOverLabel.Visible = false;
             // 
-            // ClearBoardButton
+            // EducatedPlayButton
             // 
-            this.ClearBoardButton.Location = new System.Drawing.Point(89, 378);
-            this.ClearBoardButton.Name = "ClearBoardButton";
-            this.ClearBoardButton.Size = new System.Drawing.Size(132, 20);
-            this.ClearBoardButton.TabIndex = 9;
-            this.ClearBoardButton.Text = "Clear Board";
-            this.ClearBoardButton.UseVisualStyleBackColor = true;
-            this.ClearBoardButton.Click += new System.EventHandler(this.ClearBoardButton_Click);
+            this.EducatedPlayButton.Location = new System.Drawing.Point(198, 338);
+            this.EducatedPlayButton.Name = "EducatedPlayButton";
+            this.EducatedPlayButton.Size = new System.Drawing.Size(97, 20);
+            this.EducatedPlayButton.TabIndex = 13;
+            this.EducatedPlayButton.Text = "Make Educated Play";
+            this.EducatedPlayButton.UseVisualStyleBackColor = true;
+            this.EducatedPlayButton.Click += new System.EventHandler(this.EducatedPlayButton_Click);
             // 
-            // RunGamesButton
+            // MoveDepth
             // 
-            this.RunGamesButton.Location = new System.Drawing.Point(142, 404);
-            this.RunGamesButton.Name = "RunGamesButton";
-            this.RunGamesButton.Size = new System.Drawing.Size(79, 20);
-            this.RunGamesButton.TabIndex = 10;
-            this.RunGamesButton.Text = "Run Games";
-            this.RunGamesButton.UseVisualStyleBackColor = true;
-            this.RunGamesButton.Click += new System.EventHandler(this.RunGamesButton_Click);
-            // 
-            // GameCountTextBox
-            // 
-            this.GameCountTextBox.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.GameCountTextBox.Location = new System.Drawing.Point(89, 404);
-            this.GameCountTextBox.MaxLength = 4;
-            this.GameCountTextBox.Name = "GameCountTextBox";
-            this.GameCountTextBox.Size = new System.Drawing.Size(46, 20);
-            this.GameCountTextBox.TabIndex = 11;
+            this.MoveDepth.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
+            this.MoveDepth.Location = new System.Drawing.Point(157, 338);
+            this.MoveDepth.MaxLength = 4;
+            this.MoveDepth.Name = "MoveDepth";
+            this.MoveDepth.Size = new System.Drawing.Size(35, 20);
+            this.MoveDepth.TabIndex = 14;
             // 
             // OthelloForm
             // 
@@ -220,6 +255,9 @@
         private System.Windows.Forms.Button ClearBoardButton;
         private System.Windows.Forms.TextBox GameCountTextBox;
         private System.Windows.Forms.Button RunGamesButton;
+        private System.Windows.Forms.Button RunNetButton;
+        private System.Windows.Forms.Button EducatedPlayButton;
+        private System.Windows.Forms.TextBox MoveDepth;
     }
 }
 

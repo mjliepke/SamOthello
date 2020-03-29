@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace SamOthellop
 {
-    class OthelloBoard
+    class OthelloGame
     {
         public enum BoardStates
         {
-            white = 0,
+            white = 2,
             black = 1,
-            empty = 2
+            empty = 0
         }
 
         public static Dictionary<BoardStates, System.Drawing.Color> BoardStateColors = new Dictionary<BoardStates, System.Drawing.Color>()
@@ -27,28 +27,31 @@ namespace SamOthellop
         public BoardStates WhosTurn { get; private set; }
         BoardStates[,] Board;
 
-        public OthelloBoard(int boardsize = 8)
+        public OthelloGame(int boardsize = 8)
         {
             SetupGame(boardsize);
             MaxMoves = (boardsize * boardsize) - 4;//4 preoccupied spaces
         }
 
-        public BoardStates[,] GetBoard()
+        public OthelloGame(BoardStates [,] board, BoardStates whosTurn)
         {
-            return (BoardStates[,])Board.Clone();
+            BoardSize = board.GetLength(0);
+            Board = board;
+            WhosTurn = whosTurn;
+
+            MaxMoves = (BoardSize * BoardSize) - 4;//4 preoccupied spaces
         }
 
-        public int[,] GetBoardArray()
+        public OthelloGame(int [,] board, int whosTurn)
         {
-            int[,] arrayRepresentation = new int[BoardSize, BoardSize];
-            for (int i = 0; i < BoardSize; i++)
+            BoardSize = board.GetLength(0);
+            for(int i=0;i<BoardSize; i++)
             {
-                for (int j = 0; j < BoardSize; j++)
+                for(int j=0; j<BoardSize; j++)
                 {
-                    arrayRepresentation[i, j] = (int)(Board[i, j]);
+                    Board[i, j] = board[i, j] == 0 ? BoardStates.empty : board[i, j] == 1 ? BoardStates.black : BoardStates.white;
                 }
             }
-            return arrayRepresentation;
         }
 
         public BoardStates OpposingPlayer(BoardStates Player)
@@ -100,7 +103,7 @@ namespace SamOthellop
         public void MakeMove(BoardStates player, int[] location)
         {
             bool valid = true;
-
+            valid &= !GameOver();
             valid &= OnBoard(location);
             valid &= Board[location[0], location[1]].Equals(BoardStates.empty);
             valid &= WhosTurn.Equals(player);
@@ -169,7 +172,71 @@ namespace SamOthellop
             return valid;
         }
 
-        //**********************Private Methods************************
+        //**************************Get Methods****************************   
+
+        public BoardStates[,] GetBoard() { return (BoardStates[,])Board.Clone(); }
+
+        public bool[,] GetWhiteStateArray() { return GetStateArray(BoardStates.white); }
+
+        public bool[,] GetBlackStateArray() { return GetStateArray(BoardStates.black); }
+
+        public bool[,] GetPlayableStateArray() { return GetPlayableStateArray(WhosTurn); }
+
+        public bool[,] GetPlayableStateArray(BoardStates player)
+        {
+            bool[,] bstates = new bool[BoardSize, BoardSize];
+            for (int i = 0; i < BoardSize; i++)
+            {
+                for (int j = 0; j < BoardSize; j++)
+                {
+                    bstates[i,j] = ValidMove(player, new int[] { i, j }) ? true : false;
+                }
+            }
+            return bstates;
+        }
+
+        public bool[] GetWhiteStateList() { return GetStateList(BoardStates.white); }
+
+        public bool[] GetBlackStateList() { return GetStateList(BoardStates.black); }
+
+        public bool[] GetBoardStateList()
+        {
+            bool[] bstate = new bool[2 * BoardSize * BoardSize];
+            Array.Copy(GetBlackStateList(), bstate, BoardSize);
+            Array.Copy(GetWhiteStateArray(), 0, bstate, BoardSize, BoardSize);
+            return bstate;
+        }
+
+        public bool[] GetPlayableStateList() { return GetPlayableStateList(WhosTurn); }
+
+        public int GetWhitePieceCount() { return GetPieceCount(BoardStates.white); }
+
+        public int GetBlackPieceCount() { return GetPieceCount(BoardStates.black); }
+
+        public int GetPieceCount(BoardStates bstate)
+        {
+            int count = 0;
+            foreach (BoardStates piece in Board)
+            {
+                if (piece.Equals(bstate)) count++;
+            }
+            return count;
+        }
+
+        public bool[] GetPlayableStateList(BoardStates player)
+        {
+            bool[] bstates = new bool[BoardSize * BoardSize];
+            for (int i = 0; i < BoardSize; i++)
+            {
+                for (int j = 0; j < BoardSize; j++)
+                {
+                    bstates[i + j] = ValidMove(player, new int[] { i, j }) ? true : false;
+                }
+            }
+            return bstates;
+        }
+
+        //**************************Private Methods****************************
 
         private int[,] TakesPieces(BoardStates player, int[] location)
         {
@@ -227,6 +294,39 @@ namespace SamOthellop
                 trimmedTaken[i, 1] = taken[i, 1];
             }
             return trimmedTaken;
+        }
+
+        private bool[,] GetStateArray(BoardStates bstate)
+        ///
+        ///Returns bool array of bstate peices the size of the board,
+        ///With 1 meaning a bstate peice is there, 0 meaning it is not
+        ///
+        {
+            bool[,] bstates = new bool[BoardSize, BoardSize];
+            for (int i = 0; i < BoardSize; i++)
+            {
+                for (int j = 0; j < BoardSize; j++)
+                {
+                    bstates[i, j] = Board[i, j].Equals(bstate) ? true : false;
+                }
+            }
+            return bstates;
+        }
+
+        private bool[] GetStateList(BoardStates bstate)
+        ///
+        ///
+        ///
+        {
+            bool[] bstates = new bool[BoardSize * BoardSize];
+            for (int i = 0; i < BoardSize; i++)
+            {
+                for (int j = 0; j < BoardSize; j++)
+                {
+                    bstates[i + j] = Board[i, j].Equals(bstate) ? true : false;
+                }
+            }
+            return bstates;
         }
 
         private void SetupGame(int boardsize)

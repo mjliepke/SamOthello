@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SamOthellop.Model;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -14,14 +15,16 @@ namespace SamOthellop
 {
     public partial class OthelloForm : Form
     {
-        private OthelloBoard _myBoard;
+        private OthelloGame _myBoard;
         private PiecePanel[,] _boardPanels;
         private System.Timers.Timer _twoSecondTimer;
+        private BoardNeuralNet _net;
 
         public OthelloForm()
         {
             InitializeComponent();
             _twoSecondTimer = new System.Timers.Timer(2000);
+            _net = new BoardNeuralNet();
         }
 
         private void OthelloForm_Load(object sender, EventArgs e)
@@ -32,7 +35,7 @@ namespace SamOthellop
         }
         private void SetupBoard()
         {
-            _myBoard = new OthelloBoard();
+            _myBoard = new OthelloGame();
             _boardPanels = new PiecePanel[_myBoard.BoardSize, _myBoard.BoardSize];
             int tileSize = ((Size.Width > Size.Height) ? Size.Height - 45 : Size.Width - 45) / _myBoard.BoardSize;
 
@@ -51,7 +54,7 @@ namespace SamOthellop
                     _boardPanels[i, j] = newPanel;
 
                     Color panelcolor = Color.Red;
-                    if (OthelloBoard.BoardStateColors.TryGetValue(_myBoard.GetBoard()[i, j], out panelcolor))
+                    if (OthelloGame.BoardStateColors.TryGetValue(_myBoard.GetBoard()[i, j], out panelcolor))
                     {
                         _boardPanels[i, j].ReColor(panelcolor);
                     }
@@ -79,7 +82,7 @@ namespace SamOthellop
                 for (int j = 0; j < _myBoard.BoardSize; j++)
                 {
                     Color color;
-                    OthelloBoard.BoardStateColors.TryGetValue(_myBoard.GetBoard()[i, j], out color);
+                    OthelloGame.BoardStateColors.TryGetValue(_myBoard.GetBoard()[i, j], out color);
                     _boardPanels[i, j].ReColor(color);
 
                 }
@@ -95,19 +98,19 @@ namespace SamOthellop
 
         private void OthelloPeice_Click(object sender, MouseEventArgs e)
         {
-            OthelloBoard.BoardStates player = e.Button == MouseButtons.Left ? OthelloBoard.BoardStates.black : OthelloBoard.BoardStates.white;
+            OthelloGame.BoardStates player = e.Button == MouseButtons.Left ? OthelloGame.BoardStates.black : OthelloGame.BoardStates.white;
             try
             {
                 PiecePanel thisPanel = (PiecePanel)sender;
                 if (!player.Equals(_myBoard.WhosTurn))
                 {
-                    if (player.Equals(OthelloBoard.BoardStates.white))
+                    if (player.Equals(OthelloGame.BoardStates.white))
                     {
                         BlackMoveLabel.Visible = true;
                         _twoSecondTimer.Elapsed += new System.Timers.ElapsedEventHandler(BlackMoveLabel_VisibilityFalse);
                         _twoSecondTimer.Enabled = true;
                     }
-                    else if (player.Equals(OthelloBoard.BoardStates.black))
+                    else if (player.Equals(OthelloGame.BoardStates.black))
                     {
                         WhiteMoveLabel.Visible = true;
 
@@ -226,6 +229,18 @@ namespace SamOthellop
             RandomGameButton.Enabled = enable;
             RunGamesButton.Enabled = enable;
             RandomMoveButton.Enabled = enable;
+        }
+
+        private void Button1_Click(object sender, EventArgs e)
+        {
+            _net.StartTest();
+        }
+
+        private void EducatedPlayButton_Click(object sender, EventArgs e)
+        {
+            int unused = 0;
+            _myBoard.MakeMove(_myBoard.WhosTurn, _net.PredictBestMove(Convert.ToInt32(MoveDepth.Text), _myBoard, _myBoard.WhosTurn, ref unused));
+            RefreshControls();
         }
     }
 }

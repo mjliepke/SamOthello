@@ -4,11 +4,201 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Tensorflow.Binding;
+using Tensorflow;
+//using PlotNET; Dependencies don't allow this to run with Tensorflow due to Numsharp version dependencies
+using NumSharp;
+
+// For GPU version (CUDA and cuDNN are required)
+//PM> Install-Package SciSharp.TensorFlow.Redist-Windows-GPU
 
 namespace SamOthellop.Model
 {
     class BoardNeuralNet
     {
-       
+
+        public BoardNeuralNet()
+        {
+
+        }
+
+        public void StartOthelloTest()
+        {
+
+        }
+
+        public int[] PredictBestMove(int futureDepth, OthelloGame othelloGame, OthelloGame.BoardStates whosTurn, ref int treeVal)
+        ///
+        ///Looks futureDepth moves into the future, and selects the move that gains the most peices  
+        ///At heart, is a Min-Max function
+        ///
+        {
+            int[] bestMove = new int[2];
+            int topScore = 0;
+
+
+            bool[,] possibleMoves = othelloGame.GetPlayableStateArray();//map of valid moves
+            for (int i = 0; i < othelloGame.BoardSize; i++)
+            {
+                for (int j = 0; j < othelloGame.BoardSize; j++)
+                {
+                    if (!possibleMoves[i, j]) continue;
+                    OthelloGame game = new OthelloGame(othelloGame.GetBoard(), whosTurn); //Deep copy alternative
+                    game.MakeMove(whosTurn, new int[] { i, j });
+                    if (game.GetPieceCount(whosTurn) > topScore)
+                    {
+                        if (futureDepth == 1)
+                        {
+                            bestMove = new int[] { i, j };
+                            topScore = game.GetPieceCount(whosTurn);
+                            treeVal = topScore;
+                        }
+                    }
+                    if(futureDepth > 1){
+                        game.MakeMove(game.OpposingPlayer(whosTurn), MoveGenerator(game, game.OpposingPlayer(whosTurn)));
+                        int currentVal = 0;
+                        int[] bestTreeMove = PredictBestMove(futureDepth - 1, game, whosTurn, ref currentVal);
+                        if(treeVal > topScore)
+                        {
+                            topScore = treeVal;
+                            bestMove = bestTreeMove;
+                        }
+                    }
+                }
+            }
+
+            return bestMove;
+        }
+
+        private int[] MoveGenerator(OthelloGame othelloGame, OthelloGame.BoardStates whosTurn)
+        {
+            int[] move = new int[2];
+
+            int currentVal = 0;
+            move = PredictBestMove(1, othelloGame, whosTurn, ref currentVal);//In the future will be changed to neural net's move choice
+
+            return move;
+        }
+
+        public void StartTest()
+        {
+            int training_epochs = 15000;
+
+            // Parameters
+            float learning_rate = 0.01f;
+            int display_step = 50;
+
+            NumPyRandom rng = np.random;
+            NDArray train_X, train_Y;
+            int n_samples;
+
+            train_X = np.array(3.3f, 4.4f, 5.5f, 6.71f, 6.93f, 4.168f, 9.779f, 6.182f, 7.59f, 2.167f,
+             7.042f, 10.791f, 5.313f, 7.997f, 5.654f, 9.27f, 3.1f);
+            train_Y = np.array(1.7f, 2.76f, 2.09f, 3.19f, 1.694f, 1.573f, 3.366f, 2.596f, 2.53f, 1.221f,
+                         2.827f, 3.465f, 1.65f, 2.904f, 2.42f, 2.94f, 1.3f);
+            n_samples = train_X.shape[0];
+
+            // tf Graph Input
+            var X = tf.placeholder(tf.float32);
+            var Y = tf.placeholder(tf.float32);
+
+            // Set model weights 
+            // We can set a fixed init value in order to debug
+            // var rnd1 = rng.randn<float>();
+            // var rnd2 = rng.randn<float>();
+            var W = tf.Variable(-0.06f, name: "weight");
+            var b = tf.Variable(-0.73f, name: "bias");
+
+            // Construct a linear model
+            var pred = tf.add(tf.multiply(X, W), b);
+
+            // Mean squared error
+            var cost = tf.reduce_sum(tf.pow(pred - Y, 2.0f)) / (2.0f * n_samples);
+
+            // Gradient descent
+            // Note, minimize() knows to modify W and b because Variable objects are trainable=True by default
+            var optimizer = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost);
+
+            // Initialize the variables (i.e. assign their default value)
+            var init = tf.global_variables_initializer();
+
+            //var config = tf.ConfigProto('CPU':0);
+
+            // Start training
+            //var config = ConfigProto.IntraOpParallelismThreadsFieldNumber;
+            using (var sess = tf.Session())
+            {
+                // Run the initializer
+                sess.run(init);
+
+                // Fit all training data
+                for (int epoch = 0; epoch < training_epochs; epoch++)
+                {
+                    foreach (var (x, y) in zip<float>(train_X, train_Y))
+                    {
+                        sess.run(optimizer,
+                            new FeedItem(X, x),
+                            new FeedItem(Y, y));
+                    }
+
+                    // Display logs per epoch step
+                    if ((epoch + 1) % display_step == 0)
+                    {
+                        var c = sess.run(cost,
+                            new FeedItem(X, train_X),
+                            new FeedItem(Y, train_Y));
+                        Console.WriteLine($"Epoch: {epoch + 1} cost={c} " + $"W={sess.run(W)} b={sess.run(b)}");
+                    }
+                }
+
+                Console.WriteLine("Optimization Finished!");
+
+                var training_cost = sess.run(cost,
+                    new FeedItem(X, train_X),
+                    new FeedItem(Y, train_Y));
+
+                //var plotter = new Plotter();
+
+                //plotter.Plot(
+                //    train_X,
+                //    train_Y,
+                //    "Original data", ChartType.Scatter, "markers");
+                //plotter.Plot(
+                //    train_X,
+                //    sess.run(W) * train_X + sess.run(b),
+                //   "Fitted line", ChartType.Scatter, "Fitted line");
+
+                //plotter.Show();
+
+                // Testing example
+                var test_X = np.array(6.83f, 4.668f, 8.9f, 7.91f, 5.7f, 8.7f, 3.1f, 2.1f);
+                var test_Y = np.array(1.84f, 2.273f, 3.2f, 2.831f, 2.92f, 3.24f, 1.35f, 1.03f);
+
+                Console.WriteLine("Testing... (Mean square loss Comparison)");
+
+                var testing_cost = sess.run(tf.reduce_sum(tf.pow(pred - Y, 2.0f)) / (2.0f * test_X.shape[0]),
+                    new FeedItem(X, test_X),
+                    new FeedItem(Y, test_Y));
+
+                Console.WriteLine($"Testing cost={testing_cost}");
+
+                var diff = Math.Abs((float)training_cost - (float)testing_cost);
+                Console.WriteLine($"Absolute mean square loss difference: {diff}");
+
+                //plotter.Plot(
+                //    test_X,
+                //    test_Y,
+                //    "Testing data", ChartType.Scatter, "markers");
+                //plotter.Plot(
+                //    train_X,
+                //    sess.run(W) * train_X + sess.run(b),
+                //    "Fitted line", ChartType.Scatter);
+
+                //plotter.Show();
+
+                //return diff < 0.01;
+            }
+
+        }
+
     }
 }
