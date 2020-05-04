@@ -23,6 +23,10 @@ namespace SamOthellop.Model
 
         public void StartOthelloTest()
         {
+            int training_epochs = 1000;
+            float learning_rate = .05f;
+            int display_step = 100;
+
 
         }
 
@@ -33,45 +37,45 @@ namespace SamOthellop.Model
         ///
         {
             int[] bestMove = new int[2];
-            int topScore = 0;
+            //int topScore = 0;
 
 
-            bool[,] possibleMoves = othelloGame.GetPlayableStateArray();//map of valid moves
-            for (int i = 0; i < othelloGame.BoardSize; i++)
-            {
-                for (int j = 0; j < othelloGame.BoardSize; j++)
-                {
-                    if (!possibleMoves[i, j]) continue;
-                    OthelloGame game = new OthelloGame(othelloGame.GetBoard(), whosTurn); //Deep copy alternative
-                    game.MakeMove(whosTurn, new int[] { i, j });
-                    if (game.GetPieceCount(whosTurn) > topScore)
-                    {
-                        if (futureDepth == 1)
-                        {
-                            bestMove = new int[] { i, j };
-                            topScore = game.GetPieceCount(whosTurn);
-                            treeVal = topScore;
-                        }
-                    }
-                    if(futureDepth > 1){
-                        game.MakeMove(game.OpposingPlayer(whosTurn), MoveGenerator(game, game.OpposingPlayer(whosTurn)));
-                        int currentVal = 0;
-                        int[] bestTreeMove = PredictBestMove(futureDepth - 1, game, whosTurn, ref currentVal);
-                        if(treeVal > topScore)
-                        {
-                            topScore = treeVal;
-                            bestMove = bestTreeMove;
-                        }
-                    }
-                }
-            }
+            //bool[,] possibleMoves = othelloGame.GetPlayableStateArray();//map of valid moves
+            //for (int i = 0; i < othelloGame.BoardSize; i++)
+            //{
+            //    for (int j = 0; j < othelloGame.BoardSize; j++)
+            //    {
+            //        if (!possibleMoves[i, j]) continue;
+            //        OthelloGame game = new OthelloGame(othelloGame.GetBoard(), whosTurn); //Deep copy alternative
+            //        game.MakeMove(whosTurn, new int[] { i, j });
+            //        if (game.GetPieceCount(whosTurn) > topScore)
+            //        {
+            //            if (futureDepth == 1)
+            //            {
+            //                bestMove = new int[] { i, j };
+            //                topScore = game.GetPieceCount(whosTurn);
+            //                treeVal = topScore;
+            //            }
+            //        }
+            //        if(futureDepth > 1){
+            //            game.MakeMove(game.OpposingPlayer(whosTurn), MoveGenerator(game, game.OpposingPlayer(whosTurn)));
+            //            int currentVal = 0;
+            //            int[] bestTreeMove = PredictBestMove(futureDepth - 1, game, whosTurn, ref currentVal);
+            //            if(treeVal > topScore)
+            //            {
+            //                topScore = treeVal;
+            //                bestMove = bestTreeMove;
+            //            }
+            //        }
+            //    }
+            //}
 
             return bestMove;
         }
 
         private int[] MoveGenerator(OthelloGame othelloGame, OthelloGame.BoardStates whosTurn)
         {
-            int[] move = new int[2];
+            int[] move;
 
             int currentVal = 0;
             move = PredictBestMove(1, othelloGame, whosTurn, ref currentVal);//In the future will be changed to neural net's move choice
@@ -81,7 +85,7 @@ namespace SamOthellop.Model
 
         public void StartTest()
         {
-            int training_epochs = 15000;
+            int training_epochs = 1000;
 
             // Parameters
             float learning_rate = 0.01f;
@@ -146,7 +150,9 @@ namespace SamOthellop.Model
                         var c = sess.run(cost,
                             new FeedItem(X, train_X),
                             new FeedItem(Y, train_Y));
-                        Console.WriteLine($"Epoch: {epoch + 1} cost={c} " + $"W={sess.run(W)} b={sess.run(b)}");
+
+                            Console.WriteLine($"Epoch: {epoch + 1} cost={c} " + $"W={sess.run(W)} b={sess.run(b)}");
+
                     }
                 }
 

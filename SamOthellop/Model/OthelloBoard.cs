@@ -1,6 +1,9 @@
-﻿using System;
+﻿using NumSharp.Extensions;
+using SamOthellop.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,6 +29,7 @@ namespace SamOthellop
         public int MaxMoves { get; private set; }
         public BoardStates WhosTurn { get; private set; }
         BoardStates[,] Board;
+        BoardStates[][,] BoardHistory;
 
         public OthelloGame(int boardsize = 8)
         {
@@ -33,23 +37,44 @@ namespace SamOthellop
             MaxMoves = (boardsize * boardsize) - 4;//4 preoccupied spaces
         }
 
-        public OthelloGame(BoardStates [,] board, BoardStates whosTurn)
-        {
-            BoardSize = board.GetLength(0);
-            Board = board;
-            WhosTurn = whosTurn;
+        //public OthelloGame(BoardStates [,] board, BoardStates whosTurn)
+        //{
+        //    BoardSize = board.GetLength(0);
+        //    Board = board;
+        //    WhosTurn = whosTurn;
 
-            MaxMoves = (BoardSize * BoardSize) - 4;//4 preoccupied spaces
-        }
+        //    MaxMoves = (BoardSize * BoardSize) - 4;//4 preoccupied spaces
 
-        public OthelloGame(int [,] board, int whosTurn)
+        //    BoardHistory = new BoardStates[60][,];//60 is max movecount
+        //}
+
+        //public OthelloGame(int [,] board, int whosTurn)
+        //{
+        //    BoardSize = board.GetLength(0);
+        //    for(int i=0;i<BoardSize; i++)
+        //    {
+        //        for(int j=0; j<BoardSize; j++)
+        //        {
+        //            Board[i, j] = board[i, j] == 0 ? BoardStates.empty : board[i, j] == 1 ? BoardStates.black : BoardStates.white;
+        //        }
+        //    }
+        //}
+
+        public OthelloGame(ThorGame game)
         {
-            BoardSize = board.GetLength(0);
-            for(int i=0;i<BoardSize; i++)
+            SetupGame(8);
+            MaxMoves = 60;//4 preoccupied spaces
+            BoardHistory = new BoardStates[60][,];//60 is max movecount
+
+            foreach (string play in game.Plays)
             {
-                for(int j=0; j<BoardSize; j++)
+                char colchar = play.ElementAt(0);
+                char rowchar = play.ElementAt(1);
+                int col = Int16.Parse((colchar - 'a' + 1).ToString()) - 1;//substract one to start @ index of 0
+                int row = Int16.Parse(rowchar.ToString()) - 1;
+                if (!MakeMove(new int[] { row, col }))
                 {
-                    Board[i, j] = board[i, j] == 0 ? BoardStates.empty : board[i, j] == 1 ? BoardStates.black : BoardStates.white;
+                    throw new Exception("An invalid move was made while trying to recreate ThorGame");
                 }
             }
         }
@@ -100,8 +125,9 @@ namespace SamOthellop
             return playCount;
         }
 
-        public void MakeMove(BoardStates player, int[] location)
+        public bool MakeMove(BoardStates player, int[] location)
         {
+            bool moveMade = false;
             bool valid = true;
             valid &= !GameOver();
             valid &= OnBoard(location);
@@ -118,7 +144,17 @@ namespace SamOthellop
                     Board[takenPieces[i, 0], takenPieces[i, 1]] = player;
                 }
                 WhosTurn = OpposingPlayer(player);
+
+                BoardHistory[MovesMade()] = (BoardStates[,])Board.Clone();
+                moveMade = true;
             }
+            return moveMade;
+        }
+
+        public bool MakeMove(int[] location)
+        {
+            BoardStates player = WhosTurn;
+            return MakeMove(player, location);
         }
 
         public void MakeRandomMove(BoardStates player)
@@ -174,6 +210,19 @@ namespace SamOthellop
 
         //**************************Get Methods****************************   
 
+        public BoardStates[,] GetBoardAtMove(int move)
+        {
+            try
+            {
+                return BoardHistory[move];
+            }
+            catch (Exception e)
+            {
+                System.Console.WriteLine("Can't retreive board history");
+                return new BoardStates[8, 8];
+            }
+        }
+
         public BoardStates[,] GetBoard() { return (BoardStates[,])Board.Clone(); }
 
         public bool[,] GetWhiteStateArray() { return GetStateArray(BoardStates.white); }
@@ -189,7 +238,7 @@ namespace SamOthellop
             {
                 for (int j = 0; j < BoardSize; j++)
                 {
-                    bstates[i,j] = ValidMove(player, new int[] { i, j }) ? true : false;
+                    bstates[i, j] = ValidMove(player, new int[] { i, j }) ? true : false;
                 }
             }
             return bstates;
@@ -332,6 +381,7 @@ namespace SamOthellop
         private void SetupGame(int boardsize)
         {
             BoardSize = boardsize;
+            BoardHistory = new BoardStates[61][,];//60 moves + initial
             Board = new BoardStates[boardsize, boardsize];
             for (int i = 0; i < BoardSize; i++)
             {
@@ -346,6 +396,7 @@ namespace SamOthellop
             Board[BoardSize / 2, BoardSize / 2] = BoardStates.white;
 
             WhosTurn = BoardStates.black;
+            BoardHistory[0] = (BoardStates[,])Board.Clone();
         }
 
         private bool OnBoard(int[] location)

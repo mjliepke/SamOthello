@@ -30,11 +30,14 @@
         {
             this.InstructionBrowser = new System.Windows.Forms.WebBrowser();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.FileLoadButton = new System.Windows.Forms.Button();
+            this.FileLoadTextBox = new System.Windows.Forms.TextBox();
+            this.MoveDepth = new System.Windows.Forms.TextBox();
+            this.EducatedPlayButton = new System.Windows.Forms.Button();
             this.RunNetButton = new System.Windows.Forms.Button();
             this.GameCountTextBox = new System.Windows.Forms.TextBox();
             this.RunGamesButton = new System.Windows.Forms.Button();
             this.ClearBoardButton = new System.Windows.Forms.Button();
-            this.RandomGameButton = new System.Windows.Forms.Button();
             this.RandomMoveButton = new System.Windows.Forms.Button();
             this.BlackMoveLabel = new System.Windows.Forms.Label();
             this.InvalidMoveLabel = new System.Windows.Forms.Label();
@@ -42,8 +45,8 @@
             this.gameProgressLabel = new System.Windows.Forms.Label();
             this.GameCompletionProgressBar = new System.Windows.Forms.ProgressBar();
             this.GameOverLabel = new System.Windows.Forms.Label();
-            this.EducatedPlayButton = new System.Windows.Forms.Button();
-            this.MoveDepth = new System.Windows.Forms.TextBox();
+            this.PreviousMoveButton = new System.Windows.Forms.Button();
+            this.NextMoveButton = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -59,13 +62,16 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.NextMoveButton);
+            this.groupBox1.Controls.Add(this.PreviousMoveButton);
+            this.groupBox1.Controls.Add(this.FileLoadButton);
+            this.groupBox1.Controls.Add(this.FileLoadTextBox);
             this.groupBox1.Controls.Add(this.MoveDepth);
             this.groupBox1.Controls.Add(this.EducatedPlayButton);
             this.groupBox1.Controls.Add(this.RunNetButton);
             this.groupBox1.Controls.Add(this.GameCountTextBox);
             this.groupBox1.Controls.Add(this.RunGamesButton);
             this.groupBox1.Controls.Add(this.ClearBoardButton);
-            this.groupBox1.Controls.Add(this.RandomGameButton);
             this.groupBox1.Controls.Add(this.RandomMoveButton);
             this.groupBox1.Controls.Add(this.BlackMoveLabel);
             this.groupBox1.Controls.Add(this.InvalidMoveLabel);
@@ -81,6 +87,43 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = " ";
             // 
+            // FileLoadButton
+            // 
+            this.FileLoadButton.Location = new System.Drawing.Point(240, 363);
+            this.FileLoadButton.Name = "FileLoadButton";
+            this.FileLoadButton.Size = new System.Drawing.Size(55, 23);
+            this.FileLoadButton.TabIndex = 16;
+            this.FileLoadButton.Text = "LoadGames";
+            this.FileLoadButton.UseVisualStyleBackColor = true;
+            this.FileLoadButton.Click += new System.EventHandler(this.FileLoadButton_Click);
+            // 
+            // FileLoadTextBox
+            // 
+            this.FileLoadTextBox.Location = new System.Drawing.Point(157, 365);
+            this.FileLoadTextBox.Name = "FileLoadTextBox";
+            this.FileLoadTextBox.Size = new System.Drawing.Size(77, 20);
+            this.FileLoadTextBox.TabIndex = 15;
+            // 
+            // MoveDepth
+            // 
+            this.MoveDepth.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
+            this.MoveDepth.Location = new System.Drawing.Point(157, 338);
+            this.MoveDepth.MaxLength = 4;
+            this.MoveDepth.Name = "MoveDepth";
+            this.MoveDepth.Size = new System.Drawing.Size(35, 20);
+            this.MoveDepth.TabIndex = 14;
+            this.MoveDepth.Text = "1";
+            // 
+            // EducatedPlayButton
+            // 
+            this.EducatedPlayButton.Location = new System.Drawing.Point(198, 338);
+            this.EducatedPlayButton.Name = "EducatedPlayButton";
+            this.EducatedPlayButton.Size = new System.Drawing.Size(97, 20);
+            this.EducatedPlayButton.TabIndex = 13;
+            this.EducatedPlayButton.Text = "Make Educated Play";
+            this.EducatedPlayButton.UseVisualStyleBackColor = true;
+            this.EducatedPlayButton.Click += new System.EventHandler(this.EducatedPlayButton_Click);
+            // 
             // RunNetButton
             // 
             this.RunNetButton.Location = new System.Drawing.Point(170, 312);
@@ -89,20 +132,21 @@
             this.RunNetButton.TabIndex = 12;
             this.RunNetButton.Text = "Run Neural Net";
             this.RunNetButton.UseVisualStyleBackColor = true;
-            this.RunNetButton.Click += new System.EventHandler(this.Button1_Click);
+            this.RunNetButton.Click += new System.EventHandler(this.RunNet_Click);
             // 
             // GameCountTextBox
             // 
             this.GameCountTextBox.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.GameCountTextBox.Location = new System.Drawing.Point(18, 390);
+            this.GameCountTextBox.Location = new System.Drawing.Point(18, 363);
             this.GameCountTextBox.MaxLength = 4;
             this.GameCountTextBox.Name = "GameCountTextBox";
             this.GameCountTextBox.Size = new System.Drawing.Size(35, 20);
             this.GameCountTextBox.TabIndex = 11;
+            this.GameCountTextBox.Text = "100";
             // 
             // RunGamesButton
             // 
-            this.RunGamesButton.Location = new System.Drawing.Point(50, 390);
+            this.RunGamesButton.Location = new System.Drawing.Point(50, 363);
             this.RunGamesButton.Name = "RunGamesButton";
             this.RunGamesButton.Size = new System.Drawing.Size(71, 20);
             this.RunGamesButton.TabIndex = 10;
@@ -112,23 +156,13 @@
             // 
             // ClearBoardButton
             // 
-            this.ClearBoardButton.Location = new System.Drawing.Point(18, 364);
+            this.ClearBoardButton.Location = new System.Drawing.Point(18, 338);
             this.ClearBoardButton.Name = "ClearBoardButton";
             this.ClearBoardButton.Size = new System.Drawing.Size(103, 20);
             this.ClearBoardButton.TabIndex = 9;
             this.ClearBoardButton.Text = "Clear Board";
             this.ClearBoardButton.UseVisualStyleBackColor = true;
             this.ClearBoardButton.Click += new System.EventHandler(this.ClearBoardButton_Click);
-            // 
-            // RandomGameButton
-            // 
-            this.RandomGameButton.Location = new System.Drawing.Point(18, 338);
-            this.RandomGameButton.Name = "RandomGameButton";
-            this.RandomGameButton.Size = new System.Drawing.Size(103, 20);
-            this.RandomGameButton.TabIndex = 8;
-            this.RandomGameButton.Text = "Random Game";
-            this.RandomGameButton.UseVisualStyleBackColor = true;
-            this.RandomGameButton.Click += new System.EventHandler(this.RandomGameButton_Click);
             // 
             // RandomMoveButton
             // 
@@ -203,24 +237,25 @@
             this.GameOverLabel.Text = "GAME OVER";
             this.GameOverLabel.Visible = false;
             // 
-            // EducatedPlayButton
+            // PreviousMoveButton
             // 
-            this.EducatedPlayButton.Location = new System.Drawing.Point(198, 338);
-            this.EducatedPlayButton.Name = "EducatedPlayButton";
-            this.EducatedPlayButton.Size = new System.Drawing.Size(97, 20);
-            this.EducatedPlayButton.TabIndex = 13;
-            this.EducatedPlayButton.Text = "Make Educated Play";
-            this.EducatedPlayButton.UseVisualStyleBackColor = true;
-            this.EducatedPlayButton.Click += new System.EventHandler(this.EducatedPlayButton_Click);
+            this.PreviousMoveButton.Location = new System.Drawing.Point(18, 389);
+            this.PreviousMoveButton.Name = "PreviousMoveButton";
+            this.PreviousMoveButton.Size = new System.Drawing.Size(47, 19);
+            this.PreviousMoveButton.TabIndex = 17;
+            this.PreviousMoveButton.Text = "Prev";
+            this.PreviousMoveButton.UseVisualStyleBackColor = true;
+            this.PreviousMoveButton.Click += new System.EventHandler(this.PreviousMoveButton_Click);
             // 
-            // MoveDepth
+            // NextMoveButton
             // 
-            this.MoveDepth.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.MoveDepth.Location = new System.Drawing.Point(157, 338);
-            this.MoveDepth.MaxLength = 4;
-            this.MoveDepth.Name = "MoveDepth";
-            this.MoveDepth.Size = new System.Drawing.Size(35, 20);
-            this.MoveDepth.TabIndex = 14;
+            this.NextMoveButton.Location = new System.Drawing.Point(74, 389);
+            this.NextMoveButton.Name = "NextMoveButton";
+            this.NextMoveButton.Size = new System.Drawing.Size(47, 19);
+            this.NextMoveButton.TabIndex = 18;
+            this.NextMoveButton.Text = "Next";
+            this.NextMoveButton.UseVisualStyleBackColor = true;
+            this.NextMoveButton.Click += new System.EventHandler(this.NextMoveButton_Click);
             // 
             // OthelloForm
             // 
@@ -251,13 +286,16 @@
         private System.Windows.Forms.Label WhiteMoveLabel;
         private System.Windows.Forms.Button RandomMoveButton;
         private System.Windows.Forms.Label GameOverLabel;
-        private System.Windows.Forms.Button RandomGameButton;
         private System.Windows.Forms.Button ClearBoardButton;
         private System.Windows.Forms.TextBox GameCountTextBox;
         private System.Windows.Forms.Button RunGamesButton;
         private System.Windows.Forms.Button RunNetButton;
         private System.Windows.Forms.Button EducatedPlayButton;
         private System.Windows.Forms.TextBox MoveDepth;
+        private System.Windows.Forms.Button FileLoadButton;
+        private System.Windows.Forms.TextBox FileLoadTextBox;
+        private System.Windows.Forms.Button NextMoveButton;
+        private System.Windows.Forms.Button PreviousMoveButton;
     }
 }
 

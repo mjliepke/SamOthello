@@ -19,6 +19,7 @@ namespace SamOthellop
         private PiecePanel[,] _boardPanels;
         private System.Timers.Timer _twoSecondTimer;
         private BoardNeuralNet _net;
+        private int _currentViewedMove;
 
         public OthelloForm()
         {
@@ -37,6 +38,7 @@ namespace SamOthellop
         {
             _myBoard = new OthelloGame();
             _boardPanels = new PiecePanel[_myBoard.BoardSize, _myBoard.BoardSize];
+            _currentViewedMove = 0;
             int tileSize = ((Size.Width > Size.Height) ? Size.Height - 45 : Size.Width - 45) / _myBoard.BoardSize;
 
             for (int i = 0; i < _myBoard.BoardSize; i++)
@@ -65,8 +67,7 @@ namespace SamOthellop
         private void SetupInstructions()
         {
             string curDir = Directory.GetCurrentDirectory();
-            InstructionBrowser.Navigate(new Uri(String.Format("file:///{0}/Instructions.html", curDir)));
-
+            InstructionBrowser.Navigate(new Uri(String.Format("file:///{0}/View/Instructions.html", curDir)));
         }
 
         private void SetupProgressBar()
@@ -84,7 +85,7 @@ namespace SamOthellop
                     Color color;
                     OthelloGame.BoardStateColors.TryGetValue(_myBoard.GetBoard()[i, j], out color);
                     _boardPanels[i, j].ReColor(color);
-
+                    _currentViewedMove = _myBoard.MovesMade();
                 }
             }
 
@@ -93,6 +94,20 @@ namespace SamOthellop
                 GameOverLabel.Visible = true;
                 _twoSecondTimer.Elapsed += new System.Timers.ElapsedEventHandler(GameOver_VisibilityFalse);
                 _twoSecondTimer.Enabled = true;
+            }
+        }
+
+        private void RefreshControls(OthelloGame.BoardStates[,] bstate)
+        {
+            for (int i = 0; i < bstate.GetLength(0); i++)
+            {
+                for (int j = 0; j < bstate.GetLength(1); j++)
+                {
+                    Color color;
+                    OthelloGame.BoardStateColors.TryGetValue(bstate[i, j], out color);
+                    _boardPanels[i, j].ReColor(color);
+
+                }
             }
         }
 
@@ -214,26 +229,37 @@ namespace SamOthellop
                     Invoke(new Action(() =>
                     {
                         RefreshControls();
-                        EnableControlButtons();
                     }));
                     _myBoard.ResetBoard();
                     Thread.Sleep(5);
                 }
+                Invoke(new Action(() =>
+                {
+                    RefreshControls();
+                    EnableControlButtons();
+                }));
             }).Start();
 
-
-
         }
+
         private void EnableControlButtons(bool enable = true)
         {
-            RandomGameButton.Enabled = enable;
-            RunGamesButton.Enabled = enable;
-            RandomMoveButton.Enabled = enable;
+            foreach (Control b in this.Controls)
+            {
+                if (b.GetType() == typeof(Button))
+                {
+                    b.Enabled = enable;
+                }
+            }
         }
 
-        private void Button1_Click(object sender, EventArgs e)
+        private void RunNet_Click(object sender, EventArgs e)
         {
-            _net.StartTest();
+            new Thread(() =>
+            {
+                BoardNeuralNet net = new BoardNeuralNet();
+                _net.StartTest();
+            }).Start();
         }
 
         private void EducatedPlayButton_Click(object sender, EventArgs e)
@@ -241,6 +267,32 @@ namespace SamOthellop
             int unused = 0;
             _myBoard.MakeMove(_myBoard.WhosTurn, _net.PredictBestMove(Convert.ToInt32(MoveDepth.Text), _myBoard, _myBoard.WhosTurn, ref unused));
             RefreshControls();
+        }
+
+        private void FileLoadButton_Click(object sender, EventArgs e)
+        {
+            
+            List<ThorGame> games = FileIO.ReadThorFile();
+            
+            foreach(ThorGame tgame in games)
+            {
+                OthelloGame oGame = new OthelloGame(tgame);
+            }
+        }
+
+        private void PreviousMoveButton_Click(object sender, EventArgs e)
+        {
+            _currentViewedMove -= 1;
+            OthelloGame.BoardStates[,] bstate = _myBoard.GetBoardAtMove(_currentViewedMove);
+            RefreshControls(bstate);
+        }
+
+        private void NextMoveButton_Click(object sender, EventArgs e)
+        {
+            if(_currentViewedMove == _myBoard.MovesMade()) { return; }
+            _currentViewedMove += 1;
+            OthelloGame.BoardStates[,] bstate = _myBoard.GetBoardAtMove(_currentViewedMove);
+            RefreshControls(bstate);
         }
     }
 }

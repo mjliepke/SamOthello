@@ -8,3 +8,12 @@
 *.cache
 *.cache
 SamOthellop/obj/Debug/DesignTimeResolveAssemblyReferences.cache
+*.xml
+*.dll
+*.resources
+*.cache
+*.txt
+*._
+*.nupkg
+*.p7s
+*.props
