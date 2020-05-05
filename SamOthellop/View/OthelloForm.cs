@@ -271,40 +271,65 @@ namespace SamOthellop
 
         private void FileLoadButton_Click(object sender, EventArgs e)
         {
-            var curDir = Directory.GetCurrentDirectory();
-            Console.WriteLine(curDir);
-            var files = Directory.GetFiles(@"C:\Users\mjlie\source\repos\SamOthellop\SamOthellop\Database", "*.wtb").OrderBy(x => x).ToList();
-            foreach (var file in files)
+            new Thread(() =>
             {
-                new Thread(() =>
+                var curDir = Directory.GetCurrentDirectory();
+                Console.WriteLine(curDir);
+                var files = Directory.GetFiles(@"C:\Users\mjlie\source\repos\SamOthellop\SamOthellop\Database", "*.wtb").OrderBy(x => x).ToList();
+                List<OthelloGame> gameRepo = new List<OthelloGame>();
+
+                var totalstopwatch = System.Diagnostics.Stopwatch.StartNew();
+
+                List<Thread> fileIOThreadList = new List<Thread>();
+
+                foreach (var file in files)
                 {
-                    if (!files.Any())
+                    List<OthelloGame> fileGameRepo = new List<OthelloGame>();
+                    fileIOThreadList.Add(new Thread(() =>
                     {
-                        throw new Exception("No Thor DB files can be found.");
-                    }
-
-                    var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-                    List<ThorGame> games = FileIO.ReadThorFile(file);
-
-                    foreach (ThorGame tgame in games)
-                    {
-                        OthelloGame oGame;
-                        //System.Diagnostics.Debug.WriteLine("transferring another Thor game to an OthelloBoard format");
-                        try
+                        if (!files.Any())
                         {
-                            oGame = new OthelloGame(tgame);
-                            //System.Diagnostics.Debug.WriteLine("passed a THOR->OthelloGame Transformation");
+                            throw new Exception("No Thor DB files can be found.");
+                        }
 
-                        }
-                        catch (Exception)
+                        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+                        List<ThorGame> games = FileIO.ReadThorFile(file);
+
+                        foreach (ThorGame tgame in games)
                         {
-                            System.Diagnostics.Debug.WriteLine("failed a THOR->OthelloGame Transformation");
+                            OthelloGame oGame;
+                            //System.Diagnostics.Debug.WriteLine("transferring another Thor game to an OthelloBoard format");
+                            try
+                            {
+                                oGame = new OthelloGame(tgame);
+                                fileGameRepo = fileGameRepo.Concat(OthelloGame.GetAllGameRotations(oGame)).ToList();
+                                //System.Diagnostics.Debug.WriteLine("passed a THOR->OthelloGame Transformation");
+
+                            }
+                            catch (Exception)
+                            {
+                                System.Diagnostics.Debug.WriteLine("failed a THOR->OthelloGame Transformation");
+                            }
                         }
-                    }
-                    stopwatch.Stop();
-                    Console.WriteLine("Elapsed time for transferring " + file + " info= {0}", stopwatch.Elapsed);
-                }).Start();
-            }
+
+                        gameRepo = gameRepo.Concat(fileGameRepo).ToList();
+                        stopwatch.Stop();
+                        Console.WriteLine("Elapsed time for transferring " + file + " info= {0}", stopwatch.Elapsed);
+                    }));
+                }
+
+                foreach (Thread t in fileIOThreadList)
+                {
+                    t.Start();
+                }
+                foreach (Thread t in fileIOThreadList)
+                {
+                    t.Join();
+                }
+                totalstopwatch.Stop();
+                Console.WriteLine("Elapsed time for all transfer : {0}", totalstopwatch.Elapsed);
+
+            }).Start();
         }
 
         private void PreviousMoveButton_Click(object sender, EventArgs e)
