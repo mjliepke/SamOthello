@@ -3,6 +3,7 @@ using SamOthellop.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -60,8 +61,37 @@ namespace SamOthellop
             }
         }
 
+        public OthelloGame ShallowCopy()
+        {
+            return (OthelloGame)this.MemberwiseClone();
+        }
+
+        public OthelloGame DeepCopy()
+        {
+            OthelloGame game = (OthelloGame)this.MemberwiseClone();
+            for (int i = 0; i < BoardHistory.Length; i++)
+            {
+                for (int j = 0; j < BoardSize; j++)
+                {
+                    for (int k = 0; k < BoardSize; k++)
+                    {
+                        game.BoardHistory[i][j, k] = this.BoardHistory[i][j, k];
+                    }
+                }
+            }
+            for (int i = 0; i < BoardSize; i++)
+            {
+                for (int j = 0; j < BoardSize; j++)
+                {
+                    game.Board[i, j] = this.Board[i, j];
+                }
+            }
+            return game;
+        }
+
         public BoardStates OpposingPlayer(BoardStates Player)
         {
+            if (Player == BoardStates.empty) { return BoardStates.empty; }
             return (Player.Equals(BoardStates.white) ? BoardStates.black : BoardStates.white);
         }
 
@@ -201,16 +231,104 @@ namespace SamOthellop
 
         public static OthelloGame GetReflectedAcrossA8H1(OthelloGame game)
         {
+            OthelloGame newGame = game.DeepCopy();
+            for (int i = 0; i < game.BoardHistory.Length; i++)
+            {
+                for (int j = 0; j < game.BoardSize; j++)
+                {
+                    for (int k = 0; k < game.BoardSize; k++)
+                    {
+                        newGame.BoardHistory[i][j, k] = game.BoardHistory[i][game.BoardSize - k - 1, game.BoardSize - j - 1];
+                    }
+                }
+            }
 
+            for (int i = 0; i < game.BoardSize; i++)
+            {
+                for (int j = 0; j < game.BoardSize; j++)
+                {
+                    newGame.Board[i, j] = game.Board[game.BoardSize - j - 1, game.BoardSize - i - 1];
+                }
+            }
+            return newGame;
         }
+
         public static OthelloGame GetReflectedAcrossA1H8(OthelloGame game)
         {
+            OthelloGame newGame = game.DeepCopy();
+            for (int i = 0; i < game.BoardHistory.Length; i++)
+            {
+                for (int j = 0; j < game.BoardSize; j++)
+                {
+                    for (int k = 0; k < game.BoardSize; k++)
+                    {
+                        newGame.BoardHistory[i][j, k] = game.BoardHistory[i][k, j];
+                    }
+                }
+            }
 
+            for (int i = 0; i < game.BoardSize; i++)
+            {
+                for (int j = 0; j < game.BoardSize; j++)
+                {
+                    newGame.Board[i, j] = game.Board[j, i];
+                }
+            }
+            return newGame;
         }
+
         public static OthelloGame GetPiRotation(OthelloGame game)
         {
+            OthelloGame newGame = game.DeepCopy();
+            for (int i = 0; i < game.BoardHistory.Length; i++)
+            {
+                for (int j = 0; j < game.BoardSize; j++)
+                {
+                    for (int k = 0; k < game.BoardSize; k++)
+                    {
+                        newGame.BoardHistory[i][j, k] = game.BoardHistory[i][game.BoardSize - j, game.BoardSize - k];
+                    }
+                }
+            }
 
+            for (int i = 0; i < game.BoardSize; i++)
+            {
+                for (int j = 0; j < game.BoardSize; j++)
+                {
+                    newGame.Board[i, j] = game.Board[game.BoardSize - j - 1, game.BoardSize - i - 1];
+                }
+            }
+            return newGame;
         }
+
+        //public static OthelloGame GetHalfPiRotation(OthelloGame game)
+        //{
+        //}
+
+        public static OthelloGame GetInverseGame(OthelloGame game)
+        {
+            OthelloGame newGame = game.DeepCopy();
+            for (int i = 0; i < game.BoardHistory.Length; i++)
+            {
+                for (int j = 0; j < game.BoardSize; j++)
+                {
+                    for (int k = 0; k < game.BoardSize; k++)
+                    {
+                        newGame.BoardHistory[i][j, k] = game.OpposingPlayer(game.BoardHistory[i][j, k]);
+                    }
+                }
+            }
+
+            for (int i = 0; i < game.BoardSize; i++)
+            {
+                for (int j = 0; j < game.BoardSize; j++)
+                {
+                    newGame.Board[i, j] = game.OpposingPlayer(game.Board[i, j]);
+                }
+            }
+            return newGame;
+        }
+
         //**************************Get Methods****************************   
 
         public BoardStates[,] GetBoardAtMove(int move)
@@ -447,7 +565,7 @@ namespace SamOthellop
                 FinalWinner = BoardStates.empty;//tie
             }
         }
-   
+
     }
 }
 
