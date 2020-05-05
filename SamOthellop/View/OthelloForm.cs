@@ -271,12 +271,39 @@ namespace SamOthellop
 
         private void FileLoadButton_Click(object sender, EventArgs e)
         {
-            
-            List<ThorGame> games = FileIO.ReadThorFile();
-            
-            foreach(ThorGame tgame in games)
+            var curDir = Directory.GetCurrentDirectory();
+            Console.WriteLine(curDir);
+            var files = Directory.GetFiles(@"C:\Users\mjlie\source\repos\SamOthellop\SamOthellop\Database", "*.wtb").OrderBy(x => x).ToList();
+            foreach (var file in files)
             {
-                OthelloGame oGame = new OthelloGame(tgame);
+                new Thread(() =>
+                {
+                    if (!files.Any())
+                    {
+                        throw new Exception("No Thor DB files can be found.");
+                    }
+
+                    var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+                    List<ThorGame> games = FileIO.ReadThorFile(file);
+
+                    foreach (ThorGame tgame in games)
+                    {
+                        OthelloGame oGame;
+                        //System.Diagnostics.Debug.WriteLine("transferring another Thor game to an OthelloBoard format");
+                        try
+                        {
+                            oGame = new OthelloGame(tgame);
+                            //System.Diagnostics.Debug.WriteLine("passed a THOR->OthelloGame Transformation");
+
+                        }
+                        catch (Exception)
+                        {
+                            System.Diagnostics.Debug.WriteLine("failed a THOR->OthelloGame Transformation");
+                        }
+                    }
+                    stopwatch.Stop();
+                    Console.WriteLine("Elapsed time for transferring " + file + " info= {0}", stopwatch.Elapsed);
+                }).Start();
             }
         }
 
@@ -289,7 +316,7 @@ namespace SamOthellop
 
         private void NextMoveButton_Click(object sender, EventArgs e)
         {
-            if(_currentViewedMove == _myBoard.MovesMade()) { return; }
+            if (_currentViewedMove == _myBoard.MovesMade()) { return; }
             _currentViewedMove += 1;
             OthelloGame.BoardStates[,] bstate = _myBoard.GetBoardAtMove(_currentViewedMove);
             RefreshControls(bstate);

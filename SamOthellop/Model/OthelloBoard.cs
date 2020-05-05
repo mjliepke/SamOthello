@@ -27,6 +27,9 @@ namespace SamOthellop
 
         public int BoardSize { get; private set; }
         public int MaxMoves { get; private set; }
+        public int FinalBlackTally { get; private set; }
+        public int FinalWhiteTally { get; private set; }
+        public BoardStates FinalWinner { get; private set; }
         public BoardStates WhosTurn { get; private set; }
         BoardStates[,] Board;
         BoardStates[][,] BoardHistory;
@@ -37,34 +40,11 @@ namespace SamOthellop
             MaxMoves = (boardsize * boardsize) - 4;//4 preoccupied spaces
         }
 
-        //public OthelloGame(BoardStates [,] board, BoardStates whosTurn)
-        //{
-        //    BoardSize = board.GetLength(0);
-        //    Board = board;
-        //    WhosTurn = whosTurn;
-
-        //    MaxMoves = (BoardSize * BoardSize) - 4;//4 preoccupied spaces
-
-        //    BoardHistory = new BoardStates[60][,];//60 is max movecount
-        //}
-
-        //public OthelloGame(int [,] board, int whosTurn)
-        //{
-        //    BoardSize = board.GetLength(0);
-        //    for(int i=0;i<BoardSize; i++)
-        //    {
-        //        for(int j=0; j<BoardSize; j++)
-        //        {
-        //            Board[i, j] = board[i, j] == 0 ? BoardStates.empty : board[i, j] == 1 ? BoardStates.black : BoardStates.white;
-        //        }
-        //    }
-        //}
-
         public OthelloGame(ThorGame game)
         {
             SetupGame(8);
             MaxMoves = 60;//4 preoccupied spaces
-            BoardHistory = new BoardStates[60][,];//60 is max movecount
+
 
             foreach (string play in game.Plays)
             {
@@ -74,6 +54,7 @@ namespace SamOthellop
                 int row = Int16.Parse(rowchar.ToString()) - 1;
                 if (!MakeMove(new int[] { row, col }))
                 {
+                    MakeMove(new int[] { row, col });
                     throw new Exception("An invalid move was made while trying to recreate ThorGame");
                 }
             }
@@ -106,6 +87,10 @@ namespace SamOthellop
                         break;
                     }
                 }
+            }
+            if (!moveExists)
+            {
+                InitializeEndOfGameAttributes();
             }
             return !moveExists;
         }
@@ -143,7 +128,11 @@ namespace SamOthellop
                 {
                     Board[takenPieces[i, 0], takenPieces[i, 1]] = player;
                 }
-                WhosTurn = OpposingPlayer(player);
+
+                if (PlayerHasMove(OpposingPlayer(player)))
+                {
+                    WhosTurn = OpposingPlayer(player);//only switch whos turn it is if other player has moves avalible
+                }
 
                 BoardHistory[MovesMade()] = (BoardStates[,])Board.Clone();
                 moveMade = true;
@@ -208,6 +197,20 @@ namespace SamOthellop
             return valid;
         }
 
+        //*************************Static Methods**************************
+
+        public static OthelloGame GetReflectedAcrossA8H1(OthelloGame game)
+        {
+
+        }
+        public static OthelloGame GetReflectedAcrossA1H8(OthelloGame game)
+        {
+
+        }
+        public static OthelloGame GetPiRotation(OthelloGame game)
+        {
+
+        }
         //**************************Get Methods****************************   
 
         public BoardStates[,] GetBoardAtMove(int move)
@@ -216,7 +219,7 @@ namespace SamOthellop
             {
                 return BoardHistory[move];
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 System.Console.WriteLine("Can't retreive board history");
                 return new BoardStates[8, 8];
@@ -224,10 +227,6 @@ namespace SamOthellop
         }
 
         public BoardStates[,] GetBoard() { return (BoardStates[,])Board.Clone(); }
-
-        public bool[,] GetWhiteStateArray() { return GetStateArray(BoardStates.white); }
-
-        public bool[,] GetBlackStateArray() { return GetStateArray(BoardStates.black); }
 
         public bool[,] GetPlayableStateArray() { return GetPlayableStateArray(WhosTurn); }
 
@@ -244,33 +243,15 @@ namespace SamOthellop
             return bstates;
         }
 
-        public bool[] GetWhiteStateList() { return GetStateList(BoardStates.white); }
-
-        public bool[] GetBlackStateList() { return GetStateList(BoardStates.black); }
-
         public bool[] GetBoardStateList()
         {
             bool[] bstate = new bool[2 * BoardSize * BoardSize];
-            Array.Copy(GetBlackStateList(), bstate, BoardSize);
-            Array.Copy(GetWhiteStateArray(), 0, bstate, BoardSize, BoardSize);
+            Array.Copy(GetStateList(BoardStates.white), bstate, BoardSize);
+            Array.Copy(GetStateList(BoardStates.black), 0, bstate, BoardSize, BoardSize);
             return bstate;
         }
 
         public bool[] GetPlayableStateList() { return GetPlayableStateList(WhosTurn); }
-
-        public int GetWhitePieceCount() { return GetPieceCount(BoardStates.white); }
-
-        public int GetBlackPieceCount() { return GetPieceCount(BoardStates.black); }
-
-        public int GetPieceCount(BoardStates bstate)
-        {
-            int count = 0;
-            foreach (BoardStates piece in Board)
-            {
-                if (piece.Equals(bstate)) count++;
-            }
-            return count;
-        }
 
         public bool[] GetPlayableStateList(BoardStates player)
         {
@@ -285,11 +266,38 @@ namespace SamOthellop
             return bstates;
         }
 
+        public bool PlayerHasMove(BoardStates player)
+        {
+            bool hasMove = false;
+            for (int i = 0; i < BoardSize; i++)
+            {
+                for (int j = 0; j < BoardSize; j++)
+                {
+                    if (ValidMove(player, new int[] { i, j }))
+                    {
+                        hasMove = true;
+                        return hasMove;
+                    }
+                }
+            }
+            return hasMove;
+        }
+
+        public int GetPieceCount(BoardStates bstate)
+        {
+            int count = 0;
+            foreach (BoardStates piece in Board)
+            {
+                if (piece.Equals(bstate)) count++;
+            }
+            return count;
+        }
+
         //**************************Private Methods****************************
 
         private int[,] TakesPieces(BoardStates player, int[] location)
         {
-            int[,] taken = new int[(BoardSize - 2) * 3, 2];//array of all pieces to be flipped
+            int[,] taken = new int[BoardSize * BoardSize, 2];//array of all pieces to be flipped
             int takenCount = 0;
 
             int minX = location[0] > 0 ? location[0] - 1 : 0;
@@ -396,6 +404,7 @@ namespace SamOthellop
             Board[BoardSize / 2, BoardSize / 2] = BoardStates.white;
 
             WhosTurn = BoardStates.black;
+            FinalWinner = BoardStates.empty;
             BoardHistory[0] = (BoardStates[,])Board.Clone();
         }
 
@@ -403,5 +412,42 @@ namespace SamOthellop
         {
             return (location[0] >= 0 && location[0] < BoardSize && location[1] >= 0 && location[1] < BoardSize);
         }
+
+        private void InitializeEndOfGameAttributes()
+        {
+            int wtally = 0;
+            int btally = 0;
+            for (int i = 0; i < BoardSize; i++)
+            {
+                for (int j = 0; j < BoardSize; j++)
+                {
+                    if (Board[i, j].Equals(BoardStates.white))
+                    {
+                        wtally++;
+                    }
+                    else if (Board[i, j].Equals(BoardStates.black))
+                    {
+                        btally++;
+                    }
+                }
+            }
+            FinalWhiteTally = wtally;
+            FinalBlackTally = btally;
+
+            if (wtally > btally)
+            {
+                FinalWinner = BoardStates.white;
+            }
+            else if (btally > wtally)
+            {
+                FinalWinner = BoardStates.black;
+            }
+            else
+            {
+                FinalWinner = BoardStates.empty;//tie
+            }
+        }
+   
     }
 }
+

@@ -40,6 +40,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>x64</PlatformTarget>
@@ -59,6 +60,9 @@
   <ItemGroup>
     <Reference Include="Google.Protobuf, Version=3.11.4.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
       <HintPath>..\packages\Google.Protobuf.3.11.4\lib\net45\Google.Protobuf.dll</HintPath>
+    </Reference>
+    <Reference Include="IntelHexFormatReader, Version=2.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\IntelHexFormatReader.2.2.3\lib\net46\IntelHexFormatReader.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -99,8 +103,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\FileIO.cs" />
     <Compile Include="Model\NeuralNet.cs" />
     <Compile Include="Model\OthelloBoard.cs" />
+    <Compile Include="Model\ThorGame.cs" />
     <Compile Include="View\OthelloForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -124,6 +130,21 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="Database\WTH_2001.wtb" />
+    <None Include="Database\WTH_2002.wtb" />
+    <None Include="Database\WTH_2003.wtb" />
+    <None Include="Database\WTH_2004.wtb" />
+    <None Include="Database\WTH_2005.wtb" />
+    <None Include="Database\WTH_2006.wtb" />
+    <None Include="Database\WTH_2007.wtb" />
+    <None Include="Database\WTH_2008.wtb" />
+    <None Include="Database\WTH_2009.wtb" />
+    <None Include="Database\WTH_2010.wtb" />
+    <None Include="Database\WTH_2011.wtb" />
+    <None Include="Database\WTH_2012.wtb" />
+    <None Include="Database\WTH_2013.wtb" />
+    <None Include="Database\WTH_2014.wtb" />
+    <None Include="Database\WTH_2015.wtb" />
     <None Include="packages.config" />
     <None Include="Properties\DataSources\OthelloBoard.BoardStates.datasource" />
     <None Include="Properties\DataSources\OthelloBoard.datasource" />
@@ -159,9 +180,6 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
