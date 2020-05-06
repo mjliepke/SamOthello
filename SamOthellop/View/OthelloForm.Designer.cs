@@ -29,7 +29,9 @@
         private void InitializeComponent()
         {
             this.InstructionBrowser = new System.Windows.Forms.WebBrowser();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.ControlGroupBox = new System.Windows.Forms.GroupBox();
+            this.NextMoveButton = new System.Windows.Forms.Button();
+            this.PreviousMoveButton = new System.Windows.Forms.Button();
             this.FileLoadButton = new System.Windows.Forms.Button();
             this.FileLoadTextBox = new System.Windows.Forms.TextBox();
             this.MoveDepth = new System.Windows.Forms.TextBox();
@@ -45,9 +47,7 @@
             this.gameProgressLabel = new System.Windows.Forms.Label();
             this.GameCompletionProgressBar = new System.Windows.Forms.ProgressBar();
             this.GameOverLabel = new System.Windows.Forms.Label();
-            this.PreviousMoveButton = new System.Windows.Forms.Button();
-            this.NextMoveButton = new System.Windows.Forms.Button();
-            this.groupBox1.SuspendLayout();
+            this.ControlGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // InstructionBrowser
@@ -60,32 +60,52 @@
             this.InstructionBrowser.Size = new System.Drawing.Size(301, 232);
             this.InstructionBrowser.TabIndex = 0;
             // 
-            // groupBox1
+            // ControlGroupBox
             // 
-            this.groupBox1.Controls.Add(this.NextMoveButton);
-            this.groupBox1.Controls.Add(this.PreviousMoveButton);
-            this.groupBox1.Controls.Add(this.FileLoadButton);
-            this.groupBox1.Controls.Add(this.FileLoadTextBox);
-            this.groupBox1.Controls.Add(this.MoveDepth);
-            this.groupBox1.Controls.Add(this.EducatedPlayButton);
-            this.groupBox1.Controls.Add(this.RunNetButton);
-            this.groupBox1.Controls.Add(this.GameCountTextBox);
-            this.groupBox1.Controls.Add(this.RunGamesButton);
-            this.groupBox1.Controls.Add(this.ClearBoardButton);
-            this.groupBox1.Controls.Add(this.RandomMoveButton);
-            this.groupBox1.Controls.Add(this.BlackMoveLabel);
-            this.groupBox1.Controls.Add(this.InvalidMoveLabel);
-            this.groupBox1.Controls.Add(this.WhiteMoveLabel);
-            this.groupBox1.Controls.Add(this.gameProgressLabel);
-            this.groupBox1.Controls.Add(this.GameCompletionProgressBar);
-            this.groupBox1.Controls.Add(this.InstructionBrowser);
-            this.groupBox1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.groupBox1.Location = new System.Drawing.Point(469, 0);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(307, 449);
-            this.groupBox1.TabIndex = 1;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = " ";
+            this.ControlGroupBox.Controls.Add(this.NextMoveButton);
+            this.ControlGroupBox.Controls.Add(this.PreviousMoveButton);
+            this.ControlGroupBox.Controls.Add(this.FileLoadButton);
+            this.ControlGroupBox.Controls.Add(this.FileLoadTextBox);
+            this.ControlGroupBox.Controls.Add(this.MoveDepth);
+            this.ControlGroupBox.Controls.Add(this.EducatedPlayButton);
+            this.ControlGroupBox.Controls.Add(this.RunNetButton);
+            this.ControlGroupBox.Controls.Add(this.GameCountTextBox);
+            this.ControlGroupBox.Controls.Add(this.RunGamesButton);
+            this.ControlGroupBox.Controls.Add(this.ClearBoardButton);
+            this.ControlGroupBox.Controls.Add(this.RandomMoveButton);
+            this.ControlGroupBox.Controls.Add(this.BlackMoveLabel);
+            this.ControlGroupBox.Controls.Add(this.InvalidMoveLabel);
+            this.ControlGroupBox.Controls.Add(this.WhiteMoveLabel);
+            this.ControlGroupBox.Controls.Add(this.gameProgressLabel);
+            this.ControlGroupBox.Controls.Add(this.GameCompletionProgressBar);
+            this.ControlGroupBox.Controls.Add(this.InstructionBrowser);
+            this.ControlGroupBox.Dock = System.Windows.Forms.DockStyle.Right;
+            this.ControlGroupBox.Location = new System.Drawing.Point(469, 0);
+            this.ControlGroupBox.Name = "ControlGroupBox";
+            this.ControlGroupBox.Size = new System.Drawing.Size(307, 449);
+            this.ControlGroupBox.TabIndex = 1;
+            this.ControlGroupBox.TabStop = false;
+            this.ControlGroupBox.Text = " ";
+            // 
+            // NextMoveButton
+            // 
+            this.NextMoveButton.Location = new System.Drawing.Point(74, 389);
+            this.NextMoveButton.Name = "NextMoveButton";
+            this.NextMoveButton.Size = new System.Drawing.Size(47, 19);
+            this.NextMoveButton.TabIndex = 18;
+            this.NextMoveButton.Text = "Next";
+            this.NextMoveButton.UseVisualStyleBackColor = true;
+            this.NextMoveButton.Click += new System.EventHandler(this.NextMoveButton_Click);
+            // 
+            // PreviousMoveButton
+            // 
+            this.PreviousMoveButton.Location = new System.Drawing.Point(18, 389);
+            this.PreviousMoveButton.Name = "PreviousMoveButton";
+            this.PreviousMoveButton.Size = new System.Drawing.Size(47, 19);
+            this.PreviousMoveButton.TabIndex = 17;
+            this.PreviousMoveButton.Text = "Prev";
+            this.PreviousMoveButton.UseVisualStyleBackColor = true;
+            this.PreviousMoveButton.Click += new System.EventHandler(this.PreviousMoveButton_Click);
             // 
             // FileLoadButton
             // 
@@ -237,39 +257,19 @@
             this.GameOverLabel.Text = "GAME OVER";
             this.GameOverLabel.Visible = false;
             // 
-            // PreviousMoveButton
-            // 
-            this.PreviousMoveButton.Location = new System.Drawing.Point(18, 389);
-            this.PreviousMoveButton.Name = "PreviousMoveButton";
-            this.PreviousMoveButton.Size = new System.Drawing.Size(47, 19);
-            this.PreviousMoveButton.TabIndex = 17;
-            this.PreviousMoveButton.Text = "Prev";
-            this.PreviousMoveButton.UseVisualStyleBackColor = true;
-            this.PreviousMoveButton.Click += new System.EventHandler(this.PreviousMoveButton_Click);
-            // 
-            // NextMoveButton
-            // 
-            this.NextMoveButton.Location = new System.Drawing.Point(74, 389);
-            this.NextMoveButton.Name = "NextMoveButton";
-            this.NextMoveButton.Size = new System.Drawing.Size(47, 19);
-            this.NextMoveButton.TabIndex = 18;
-            this.NextMoveButton.Text = "Next";
-            this.NextMoveButton.UseVisualStyleBackColor = true;
-            this.NextMoveButton.Click += new System.EventHandler(this.NextMoveButton_Click);
-            // 
             // OthelloForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(776, 449);
-            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.ControlGroupBox);
             this.Controls.Add(this.GameOverLabel);
             this.Name = "OthelloForm";
             this.Text = "Othello";
             this.Load += new System.EventHandler(this.OthelloForm_Load);
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
+            this.ControlGroupBox.ResumeLayout(false);
+            this.ControlGroupBox.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -278,7 +278,7 @@
         #endregion
 
         private System.Windows.Forms.WebBrowser InstructionBrowser;
-        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.GroupBox ControlGroupBox;
         private System.Windows.Forms.Label gameProgressLabel;
         private System.Windows.Forms.ProgressBar GameCompletionProgressBar;
         private System.Windows.Forms.Label BlackMoveLabel;

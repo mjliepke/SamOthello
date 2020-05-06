@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -37,13 +38,13 @@ namespace SamOthellop
         private void SetupBoard()
         {
             _myBoard = new OthelloGame();
-            _boardPanels = new PiecePanel[_myBoard.BoardSize, _myBoard.BoardSize];
+            _boardPanels = new PiecePanel[OthelloGame.BOARD_SIZE, OthelloGame.BOARD_SIZE];
             _currentViewedMove = 0;
-            int tileSize = ((Size.Width > Size.Height) ? Size.Height - 45 : Size.Width - 45) / _myBoard.BoardSize;
+            int tileSize = ((Size.Width > Size.Height) ? Size.Height - 45 : Size.Width - 45) / OthelloGame.BOARD_SIZE;
 
-            for (int i = 0; i < _myBoard.BoardSize; i++)
+            for (int i = 0; i < OthelloGame.BOARD_SIZE; i++)
             {
-                for (int j = 0; j < _myBoard.BoardSize; j++)
+                for (int j = 0; j < OthelloGame.BOARD_SIZE; j++)
                 {
                     var newPanel = new PiecePanel(new int[] { i, j })
                     {
@@ -78,9 +79,9 @@ namespace SamOthellop
 
         private void RefreshControls()
         {
-            for (int i = 0; i < _myBoard.BoardSize; i++)
+            for (int i = 0; i < OthelloGame.BOARD_SIZE; i++)
             {
-                for (int j = 0; j < _myBoard.BoardSize; j++)
+                for (int j = 0; j < OthelloGame.BOARD_SIZE; j++)
                 {
                     Color color;
                     OthelloGame.BoardStateColors.TryGetValue(_myBoard.GetBoard()[i, j], out color);
@@ -244,7 +245,14 @@ namespace SamOthellop
 
         private void EnableControlButtons(bool enable = true)
         {
-            foreach (Control b in this.Controls)
+            foreach (PiecePanel b in _boardPanels)
+            {
+                if (b.GetType() == typeof(Button))
+                {
+                    b.Enabled = enable;
+                }
+            }
+            foreach(Control b in ControlGroupBox.Controls)
             {
                 if (b.GetType() == typeof(Button))
                 {
@@ -264,71 +272,57 @@ namespace SamOthellop
 
         private void EducatedPlayButton_Click(object sender, EventArgs e)
         {
-            int unused = 0;
-            _myBoard.MakeMove(_myBoard.WhosTurn, _net.PredictBestMove(Convert.ToInt32(MoveDepth.Text), _myBoard, _myBoard.WhosTurn, ref unused));
-            RefreshControls();
+            EnableControlButtons(false);
+            new Thread(() =>
+            {
+                int unused = 0;
+                _myBoard.MakeMove(_myBoard.WhosTurn, _net.PredictBestMove(Convert.ToInt32(MoveDepth.Text), _myBoard, _myBoard.WhosTurn, ref unused));
+
+                Invoke(new Action(() =>
+                {
+                    RefreshControls();
+                    EnableControlButtons();
+                }));
+            }).Start();
         }
 
         private void FileLoadButton_Click(object sender, EventArgs e)
         {
             new Thread(() =>
             {
-                var curDir = Directory.GetCurrentDirectory();
-                Console.WriteLine(curDir);
-                var files = Directory.GetFiles(@"C:\Users\mjlie\source\repos\SamOthellop\SamOthellop\Database", "*.wtb").OrderBy(x => x).ToList();
-                List<OthelloGame> gameRepo = new List<OthelloGame>();
+                string path = @"C:\Users\mjlie\source\repos\SamOthellop\SamOthellop\Database";
 
-                var totalstopwatch = System.Diagnostics.Stopwatch.StartNew();
+                //var totalstopwatch1 = Stopwatch.StartNew();
+                //List<OthelloGame> method1Games = FileIO.ReadAllGames(path);
+                //totalstopwatch1.Stop();
+                //Console.WriteLine("Elapsed time for Method1 : {0}", totalstopwatch1.Elapsed);
 
-                List<Thread> fileIOThreadList = new List<Thread>();
+                var totalstopwatch2 = Stopwatch.StartNew();
+                List<OthelloGame> method2Games = FileIO.ReadAllGames(path);
+                totalstopwatch2.Stop();
+                Console.WriteLine("Elapsed time for Method2 : {0}", totalstopwatch2.Elapsed);
 
-                foreach (var file in files)
-                {
-                    List<OthelloGame> fileGameRepo = new List<OthelloGame>();
-                    fileIOThreadList.Add(new Thread(() =>
-                    {
-                        if (!files.Any())
-                        {
-                            throw new Exception("No Thor DB files can be found.");
-                        }
+                var totalstopwatch3 = Stopwatch.StartNew();
+                List<OthelloGame> method3Games = FileIO.ReadAllGames(path);
+                totalstopwatch3.Stop();
+                Console.WriteLine("Elapsed time for Method3 : {0}", totalstopwatch3.Elapsed);
 
-                        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-                        List<ThorGame> games = FileIO.ReadThorFile(file);
+                var totalstopwatch4 = Stopwatch.StartNew();
+                List<OthelloGame> method4Games = FileIO.ReadAllGames(path);
+                totalstopwatch4.Stop();
+                Console.WriteLine("Elapsed time for Method4 : {0}", totalstopwatch4.Elapsed);
 
-                        foreach (ThorGame tgame in games)
-                        {
-                            OthelloGame oGame;
-                            //System.Diagnostics.Debug.WriteLine("transferring another Thor game to an OthelloBoard format");
-                            try
-                            {
-                                oGame = new OthelloGame(tgame);
-                                fileGameRepo = fileGameRepo.Concat(OthelloGame.GetAllGameRotations(oGame)).ToList();
-                                //System.Diagnostics.Debug.WriteLine("passed a THOR->OthelloGame Transformation");
+                //Console.WriteLine("Method1: " + method1Games.Count + " games");
+                Console.WriteLine("Method2: " + method2Games.Count + " games");
+                Console.WriteLine("Method3: " + method3Games.Count + " games");
+                Console.WriteLine("Method4: " + method4Games.Count + " games");
 
-                            }
-                            catch (Exception)
-                            {
-                                System.Diagnostics.Debug.WriteLine("failed a THOR->OthelloGame Transformation");
-                            }
-                        }
+                //Console.WriteLine("Elapsed time for Method1 : {0}", totalstopwatch1.Elapsed);
+                Console.WriteLine("Elapsed time for Method2 : {0}", totalstopwatch2.Elapsed);
+                Console.WriteLine("Elapsed time for Method3 : {0}", totalstopwatch3.Elapsed);
+                Console.WriteLine("Elapsed time for Method4 : {0}", totalstopwatch4.Elapsed);
 
-                        gameRepo = gameRepo.Concat(fileGameRepo).ToList();
-                        stopwatch.Stop();
-                        Console.WriteLine("Elapsed time for transferring " + file + " info= {0}", stopwatch.Elapsed);
-                    }));
-                }
-
-                foreach (Thread t in fileIOThreadList)
-                {
-                    t.Start();
-                }
-                foreach (Thread t in fileIOThreadList)
-                {
-                    t.Join();
-                }
-                totalstopwatch.Stop();
-                Console.WriteLine("Elapsed time for all transfer : {0}", totalstopwatch.Elapsed);
-
+                Console.WriteLine("Total should be about :" + 1010000);
             }).Start();
         }
 

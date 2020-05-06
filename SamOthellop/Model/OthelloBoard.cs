@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace SamOthellop
 {
+    [Serializable]
     class OthelloGame
     {
         public enum BoardStates
@@ -26,7 +27,7 @@ namespace SamOthellop
             {BoardStates.empty, System.Drawing.Color.DarkOliveGreen }
         };
 
-        public int BoardSize { get; private set; }
+        public const int BOARD_SIZE = 8;
         public int MaxMoves { get; private set; }
         public int FinalBlackTally { get; private set; }
         public int FinalWhiteTally { get; private set; }
@@ -37,13 +38,13 @@ namespace SamOthellop
 
         public OthelloGame(int boardsize = 8)
         {
-            SetupGame(boardsize);
+            SetupGame();
             MaxMoves = (boardsize * boardsize) - 4;//4 preoccupied spaces
         }
 
         public OthelloGame(ThorGame game)
         {
-            SetupGame(8);
+            SetupGame();
             MaxMoves = 60;//4 preoccupied spaces
 
 
@@ -66,34 +67,37 @@ namespace SamOthellop
             return (OthelloGame)this.MemberwiseClone();
         }
 
+
+
         public OthelloGame DeepCopy()
         {
-            OthelloGame game = (OthelloGame)this.MemberwiseClone();
-            for (int i = 0; i < game.MovesMade(); i++)
-            {
-                for (int j = 0; j < BoardSize; j++)
-                {
-                    for (int k = 0; k < BoardSize; k++)
-                    {
-                        try
-                        {
-                            if (this.BoardHistory[i] != null)
-                            {
-                                game.BoardHistory[i][j, k] = this.BoardHistory[i][j, k];
-                            }
-                        }
-                        catch (NullReferenceException e) { }
-                    }
-                }
-            }
-            for (int i = 0; i < BoardSize; i++)
-            {
-                for (int j = 0; j < BoardSize; j++)
-                {
-                    game.Board[i, j] = this.Board[i, j];
-                }
-            }
-            return game;
+            return ObjectCopier.Clone<OthelloGame>(this);
+            //OthelloGame game = (OthelloGame)this.MemberwiseClone();
+            //for (int i = 0; i < this.MovesMade(); i++)
+            //{
+            //    for (int j = 0; j < BOARD_SIZE; j++)
+            //    {
+            //        for (int k = 0; k < BOARD_SIZE; k++)
+            //        {
+            //            try
+            //            {
+            //                if (this.BoardHistory[i] != null)
+            //                {
+            //                    game.BoardHistory[i][j, k] = this.BoardHistory[i][j, k];
+            //                }
+            //            }
+            //            catch (NullReferenceException) { }
+            //        }
+            //    }
+            //}
+            //for (int i = 0; i < BOARD_SIZE; i++)
+            //{
+            //    for (int j = 0; j < BOARD_SIZE; j++)
+            //    {
+            //        game.Board[i, j] = this.Board[i, j];
+            //    }
+            //}
+            //return game;
         }
 
         public BoardStates OpposingPlayer(BoardStates Player)
@@ -113,9 +117,9 @@ namespace SamOthellop
             bool moveExists = false;
             //for debugging:
             int i, j;
-            for (i = 0; i < BoardSize; i++)
+            for (i = 0; i < BOARD_SIZE; i++)
             {
-                for (j = 0; j < BoardSize; j++)
+                for (j = 0; j < BOARD_SIZE; j++)
                 {
                     moveExists |= ValidMove(BoardStates.black, new int[] { i, j });
                     moveExists |= ValidMove(BoardStates.white, new int[] { i, j });
@@ -134,7 +138,7 @@ namespace SamOthellop
 
         public void ResetBoard()
         {
-            SetupGame(BoardSize);
+            SetupGame();
         }
 
         public int MovesMade()
@@ -174,6 +178,10 @@ namespace SamOthellop
                 BoardHistory[MovesMade()] = (BoardStates[,])Board.Clone();
                 moveMade = true;
             }
+            else
+            {
+                int debugLocation = 0;//to stop debugger on
+            }
             return moveMade;
         }
 
@@ -187,9 +195,9 @@ namespace SamOthellop
         {
             int[,] possibleMoves = new int[MaxMoves - MovesMade(), 2];
             int possibleMoveCount = 0;
-            for (int i = 0; i < BoardSize; i++)
+            for (int i = 0; i < BOARD_SIZE; i++)
             {
-                for (int j = 0; j < BoardSize; j++)
+                for (int j = 0; j < BOARD_SIZE; j++)
                 {
                     if (ValidMove(player, new int[] { i, j }))
                     {
@@ -226,6 +234,7 @@ namespace SamOthellop
             bool valid = true;
 
             valid &= OnBoard(location);
+            if (!valid) return valid;
             valid &= Board[location[0], location[1]].Equals(BoardStates.empty);
             if (playerTurn) valid &= WhosTurn.Equals(player);
             int[,] takenPieces = TakesPieces(player, location);
@@ -241,23 +250,23 @@ namespace SamOthellop
             OthelloGame newGame = game.DeepCopy();
             for (int i = 0; i <= game.MovesMade(); i++)
             {
-                for (int j = 0; j < game.BoardSize; j++)
+                for (int j = 0; j < BOARD_SIZE; j++)
                 {
-                    for (int k = 0; k < game.BoardSize; k++)
+                    for (int k = 0; k < BOARD_SIZE; k++)
                     {
                         if (game.BoardHistory[i] != null)
                         {
-                            newGame.BoardHistory[i][j, k] = game.BoardHistory[i][game.BoardSize - k - 1, game.BoardSize - j - 1];
+                            newGame.BoardHistory[i][j, k] = game.BoardHistory[i][BOARD_SIZE - k - 1, BOARD_SIZE - j - 1];
                         }
                     }
                 }
             }
 
-            for (int i = 0; i < game.BoardSize; i++)
+            for (int i = 0; i < BOARD_SIZE; i++)
             {
-                for (int j = 0; j < game.BoardSize; j++)
+                for (int j = 0; j < BOARD_SIZE; j++)
                 {
-                    newGame.Board[i, j] = game.Board[game.BoardSize - j - 1, game.BoardSize - i - 1];
+                    newGame.Board[i, j] = game.Board[BOARD_SIZE - j - 1, BOARD_SIZE - i - 1];
                 }
             }
             return newGame;
@@ -268,9 +277,9 @@ namespace SamOthellop
             OthelloGame newGame = game.DeepCopy();
             for (int i = 0; i <= game.MovesMade(); i++)
             {
-                for (int j = 0; j < game.BoardSize; j++)
+                for (int j = 0; j < BOARD_SIZE; j++)
                 {
-                    for (int k = 0; k < game.BoardSize; k++)
+                    for (int k = 0; k < BOARD_SIZE; k++)
                     {
                         if (game.BoardHistory[i] != null)
                         {
@@ -280,9 +289,9 @@ namespace SamOthellop
                 }
             }
 
-            for (int i = 0; i < game.BoardSize; i++)
+            for (int i = 0; i < BOARD_SIZE; i++)
             {
-                for (int j = 0; j < game.BoardSize; j++)
+                for (int j = 0; j < BOARD_SIZE; j++)
                 {
                     newGame.Board[i, j] = game.Board[j, i];
                 }
@@ -301,23 +310,23 @@ namespace SamOthellop
             OthelloGame newGame = game.DeepCopy();
             for (int i = 0; i <= game.MovesMade(); i++)
             {
-                for (int j = 0; j < game.BoardSize; j++)
+                for (int j = 0; j < BOARD_SIZE; j++)
                 {
-                    for (int k = 0; k < game.BoardSize; k++)
+                    for (int k = 0; k < BOARD_SIZE; k++)
                     {
                         if (game.BoardHistory[i] != null)
                         {
-                            newGame.BoardHistory[i][j, k] = game.BoardHistory[i][game.BoardSize - k - 1, j];
+                            newGame.BoardHistory[i][j, k] = game.BoardHistory[i][BOARD_SIZE - k - 1, j];
                         }
                     }
                 }
             }
 
-            for (int i = 0; i < game.BoardSize; i++)
+            for (int i = 0; i < BOARD_SIZE; i++)
             {
-                for (int j = 0; j < game.BoardSize; j++)
+                for (int j = 0; j < BOARD_SIZE; j++)
                 {
-                    newGame.Board[i, j] = game.Board[game.BoardSize - j - 1, i];
+                    newGame.Board[i, j] = game.Board[BOARD_SIZE - j - 1, i];
                 }
             }
             return newGame;
@@ -328,9 +337,9 @@ namespace SamOthellop
             OthelloGame newGame = game.DeepCopy();
             for (int i = 0; i <= game.MovesMade(); i++)
             {
-                for (int j = 0; j < game.BoardSize; j++)
+                for (int j = 0; j < BOARD_SIZE; j++)
                 {
-                    for (int k = 0; k < game.BoardSize; k++)
+                    for (int k = 0; k < BOARD_SIZE; k++)
                     {
                         if (game.BoardHistory[i] != null)
                         {
@@ -340,9 +349,9 @@ namespace SamOthellop
                 }
             }
 
-            for (int i = 0; i < game.BoardSize; i++)
+            for (int i = 0; i < BOARD_SIZE; i++)
             {
-                for (int j = 0; j < game.BoardSize; j++)
+                for (int j = 0; j < BOARD_SIZE; j++)
                 {
                     newGame.Board[i, j] = game.OpposingPlayer(game.Board[i, j]);
                 }
@@ -388,10 +397,10 @@ namespace SamOthellop
 
         public bool[,] GetPlayableStateArray(BoardStates player)
         {
-            bool[,] bstates = new bool[BoardSize, BoardSize];
-            for (int i = 0; i < BoardSize; i++)
+            bool[,] bstates = new bool[BOARD_SIZE, BOARD_SIZE];
+            for (int i = 0; i < BOARD_SIZE; i++)
             {
-                for (int j = 0; j < BoardSize; j++)
+                for (int j = 0; j < BOARD_SIZE; j++)
                 {
                     bstates[i, j] = ValidMove(player, new int[] { i, j }) ? true : false;
                 }
@@ -401,9 +410,9 @@ namespace SamOthellop
 
         public bool[] GetBoardStateList()
         {
-            bool[] bstate = new bool[2 * BoardSize * BoardSize];
-            Array.Copy(GetStateList(BoardStates.white), bstate, BoardSize);
-            Array.Copy(GetStateList(BoardStates.black), 0, bstate, BoardSize, BoardSize);
+            bool[] bstate = new bool[2 * BOARD_SIZE * BOARD_SIZE];
+            Array.Copy(GetStateList(BoardStates.white), bstate, BOARD_SIZE);
+            Array.Copy(GetStateList(BoardStates.black), 0, bstate, BOARD_SIZE, BOARD_SIZE);
             return bstate;
         }
 
@@ -411,10 +420,10 @@ namespace SamOthellop
 
         public bool[] GetPlayableStateList(BoardStates player)
         {
-            bool[] bstates = new bool[BoardSize * BoardSize];
-            for (int i = 0; i < BoardSize; i++)
+            bool[] bstates = new bool[BOARD_SIZE * BOARD_SIZE];
+            for (int i = 0; i < BOARD_SIZE; i++)
             {
-                for (int j = 0; j < BoardSize; j++)
+                for (int j = 0; j < BOARD_SIZE; j++)
                 {
                     bstates[i + j] = ValidMove(player, new int[] { i, j }) ? true : false;
                 }
@@ -422,12 +431,27 @@ namespace SamOthellop
             return bstates;
         }
 
+        public List<int[]> GetPossiblePlayList()
+        {
+            List<int[]> possiblePlays = new List<int[]>();
+            for(int i = 0; i < BOARD_SIZE; i++)
+            {
+                for(int j = 0; j < BOARD_SIZE; j++)
+                {
+                    if(ValidMove(WhosTurn, new int[] { i, j })){
+                        possiblePlays.Add(new int[] { i, j });
+                    }
+                }
+            }
+            return possiblePlays;
+        }
+
         public bool PlayerHasMove(BoardStates player)
         {
             bool hasMove = false;
-            for (int i = 0; i < BoardSize; i++)
+            for (int i = 0; i < BOARD_SIZE; i++)
             {
-                for (int j = 0; j < BoardSize; j++)
+                for (int j = 0; j < BOARD_SIZE; j++)
                 {
                     if (ValidMove(player, new int[] { i, j }))
                     {
@@ -453,19 +477,19 @@ namespace SamOthellop
 
         private int[,] TakesPieces(BoardStates player, int[] location)
         {
-            int[,] taken = new int[BoardSize * BoardSize, 2];//array of all pieces to be flipped
+            int[,] taken = new int[BOARD_SIZE * BOARD_SIZE, 2];//array of all pieces to be flipped
             int takenCount = 0;
 
             int minX = location[0] > 0 ? location[0] - 1 : 0;
             int minY = location[1] > 0 ? location[1] - 1 : 0;
-            int maxX = location[0] + 2 < BoardSize ? location[0] + 1 : BoardSize - 1;
-            int maxY = location[1] + 2 < BoardSize ? location[1] + 1 : BoardSize - 1;
+            int maxX = location[0] + 2 < BOARD_SIZE ? location[0] + 1 : BOARD_SIZE - 1;
+            int maxY = location[1] + 2 < BOARD_SIZE ? location[1] + 1 : BOARD_SIZE - 1;
 
             for (int x = minX; x <= maxX; x++)
             {
                 for (int y = minY; y <= maxY; y++)
                 {
-                    int[,] subtaken = new int[BoardSize, 2];
+                    int[,] subtaken = new int[BOARD_SIZE, 2];
                     int subtakenCount = 0;
 
                     if ((x != location[0] || y != location[1]) && Board[x, y].Equals(OpposingPlayer(player)))
@@ -515,10 +539,10 @@ namespace SamOthellop
         ///With 1 meaning a bstate peice is there, 0 meaning it is not
         ///
         {
-            bool[,] bstates = new bool[BoardSize, BoardSize];
-            for (int i = 0; i < BoardSize; i++)
+            bool[,] bstates = new bool[BOARD_SIZE, BOARD_SIZE];
+            for (int i = 0; i < BOARD_SIZE; i++)
             {
-                for (int j = 0; j < BoardSize; j++)
+                for (int j = 0; j < BOARD_SIZE; j++)
                 {
                     bstates[i, j] = Board[i, j].Equals(bstate) ? true : false;
                 }
@@ -531,10 +555,10 @@ namespace SamOthellop
         ///
         ///
         {
-            bool[] bstates = new bool[BoardSize * BoardSize];
-            for (int i = 0; i < BoardSize; i++)
+            bool[] bstates = new bool[BOARD_SIZE * BOARD_SIZE];
+            for (int i = 0; i < BOARD_SIZE; i++)
             {
-                for (int j = 0; j < BoardSize; j++)
+                for (int j = 0; j < BOARD_SIZE; j++)
                 {
                     bstates[i + j] = Board[i, j].Equals(bstate) ? true : false;
                 }
@@ -542,22 +566,21 @@ namespace SamOthellop
             return bstates;
         }
 
-        private void SetupGame(int boardsize)
+        private void SetupGame()
         {
-            BoardSize = boardsize;
             BoardHistory = new BoardStates[61][,];//60 moves + initial
-            Board = new BoardStates[boardsize, boardsize];
-            for (int i = 0; i < BoardSize; i++)
+            Board = new BoardStates[BOARD_SIZE, BOARD_SIZE];
+            for (int i = 0; i < BOARD_SIZE; i++)
             {
-                for (int j = 0; j < BoardSize; j++)
+                for (int j = 0; j < BOARD_SIZE; j++)
                 {
                     Board[i, j] = BoardStates.empty;
                 }
             }
-            Board[BoardSize / 2 - 1, BoardSize / 2 - 1] = BoardStates.white;
-            Board[BoardSize / 2 - 1, BoardSize / 2] = BoardStates.black;
-            Board[BoardSize / 2, BoardSize / 2 - 1] = BoardStates.black;
-            Board[BoardSize / 2, BoardSize / 2] = BoardStates.white;
+            Board[BOARD_SIZE / 2 - 1, BOARD_SIZE / 2 - 1] = BoardStates.white;
+            Board[BOARD_SIZE / 2 - 1, BOARD_SIZE / 2] = BoardStates.black;
+            Board[BOARD_SIZE / 2, BOARD_SIZE / 2 - 1] = BoardStates.black;
+            Board[BOARD_SIZE / 2, BOARD_SIZE / 2] = BoardStates.white;
 
             WhosTurn = BoardStates.black;
             FinalWinner = BoardStates.empty;
@@ -566,16 +589,16 @@ namespace SamOthellop
 
         private bool OnBoard(int[] location)
         {
-            return (location[0] >= 0 && location[0] < BoardSize && location[1] >= 0 && location[1] < BoardSize);
+            return (location[0] >= 0 && location[0] < BOARD_SIZE && location[1] >= 0 && location[1] < BOARD_SIZE);
         }
 
         private void InitializeEndOfGameAttributes()
         {
             int wtally = 0;
             int btally = 0;
-            for (int i = 0; i < BoardSize; i++)
+            for (int i = 0; i < BOARD_SIZE; i++)
             {
-                for (int j = 0; j < BoardSize; j++)
+                for (int j = 0; j < BOARD_SIZE; j++)
                 {
                     if (Board[i, j].Equals(BoardStates.white))
                     {

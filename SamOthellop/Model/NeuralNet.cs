@@ -7,6 +7,7 @@ using static Tensorflow.Binding;
 using Tensorflow;
 //using PlotNET; Dependencies don't allow this to run with Tensorflow due to Numsharp version dependencies
 using NumSharp;
+using System.Windows.Forms;
 
 // For GPU version (CUDA and cuDNN are required)
 //PM> Install-Package SciSharp.TensorFlow.Redist-Windows-GPU
@@ -30,46 +31,51 @@ namespace SamOthellop.Model
 
         }
 
-        public int[] PredictBestMove(int futureDepth, OthelloGame othelloGame, OthelloGame.BoardStates whosTurn, ref int treeVal)
+        public int[] PredictBestMove(int futureDepth, OthelloGame othelloGame, OthelloGame.BoardStates player, ref int treeVal)
         ///
         ///Looks futureDepth moves into the future, and selects the move that gains the most peices  
         ///At heart, is a Min-Max function
         ///
         {
             int[] bestMove = new int[2];
-            //int topScore = 0;
+            int topScore = 0;
 
+            List<int[]> possibleMoves = othelloGame.GetPossiblePlayList();
 
-            //bool[,] possibleMoves = othelloGame.GetPlayableStateArray();//map of valid moves
-            //for (int i = 0; i < othelloGame.BoardSize; i++)
-            //{
-            //    for (int j = 0; j < othelloGame.BoardSize; j++)
-            //    {
-            //        if (!possibleMoves[i, j]) continue;
-            //        OthelloGame game = new OthelloGame(othelloGame.GetBoard(), whosTurn); //Deep copy alternative
-            //        game.MakeMove(whosTurn, new int[] { i, j });
-            //        if (game.GetPieceCount(whosTurn) > topScore)
-            //        {
-            //            if (futureDepth == 1)
-            //            {
-            //                bestMove = new int[] { i, j };
-            //                topScore = game.GetPieceCount(whosTurn);
-            //                treeVal = topScore;
-            //            }
-            //        }
-            //        if(futureDepth > 1){
-            //            game.MakeMove(game.OpposingPlayer(whosTurn), MoveGenerator(game, game.OpposingPlayer(whosTurn)));
-            //            int currentVal = 0;
-            //            int[] bestTreeMove = PredictBestMove(futureDepth - 1, game, whosTurn, ref currentVal);
-            //            if(treeVal > topScore)
-            //            {
-            //                topScore = treeVal;
-            //                bestMove = bestTreeMove;
-            //            }
-            //        }
-            //    }
-            //}
-
+           if(futureDepth == 1)
+            {
+                foreach (int[] move in possibleMoves)
+                {
+                    OthelloGame treeGame = othelloGame.DeepCopy();
+                    if(!treeGame.MakeMove(move))
+                    {
+                        throw new Exception("PredictBestMove tried to play an invalid move");
+                    }
+                    int treeScore = treeGame.GetPieceCount(player);
+                    if (treeScore > topScore) //This is the Max tree
+                    {
+                        bestMove = move;
+                        topScore = treeScore;
+                    }
+                }
+            }
+            else if (futureDepth > 1)
+            {
+                foreach(int[] move in possibleMoves)
+                {
+                    int[] treeBestMove = new int[2];
+                    OthelloGame treeGame = othelloGame.DeepCopy();
+                    treeGame.MakeMove(move);
+                    int treeScore =0;
+                    treeBestMove = PredictBestMove(futureDepth - 1, treeGame, player, ref treeScore);
+                    if(treeScore > topScore)
+                    {
+                        bestMove = move;
+                        topScore = treeScore;
+                    }
+                }
+            }
+            treeVal = topScore;
             return bestMove;
         }
 
