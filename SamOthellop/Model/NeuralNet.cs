@@ -31,20 +31,21 @@ namespace SamOthellop.Model
 
         }
 
-        public int[] PredictBestMove(int futureDepth, OthelloGame othelloGame, OthelloGame.BoardStates player, ref int treeVal)
+        public byte[] PredictBestMove(int futureDepth, OthelloGame othelloGame, BoardStates player, ref int treeVal)
         ///
         ///Looks futureDepth moves into the future, and selects the move that gains the most peices  
         ///At heart, is a Min-Max function
         ///
         {
-            int[] bestMove = new int[2];
+            byte[] bestMove = new byte[2];
             int topScore = 0;
 
-            List<int[]> possibleMoves = othelloGame.GetPossiblePlayList();
+            List<byte[]> possibleMoves = othelloGame.GetPossiblePlayList();
 
            if(futureDepth == 1)
             {
-                foreach (int[] move in possibleMoves)
+                int minScore = 0;
+                foreach (byte[] move in possibleMoves)
                 {
                     OthelloGame treeGame = othelloGame.DeepCopy();
                     if(!treeGame.MakeMove(move))
@@ -56,14 +57,17 @@ namespace SamOthellop.Model
                     {
                         bestMove = move;
                         topScore = treeScore;
+                    }else if(treeScore < minScore)
+                    {
+
                     }
                 }
             }
             else if (futureDepth > 1)
             {
-                foreach(int[] move in possibleMoves)
+                foreach(byte[] move in possibleMoves)
                 {
-                    int[] treeBestMove = new int[2];
+                    byte[] treeBestMove = new byte[2];
                     OthelloGame treeGame = othelloGame.DeepCopy();
                     treeGame.MakeMove(move);
                     int treeScore =0;
@@ -81,7 +85,7 @@ namespace SamOthellop.Model
 
         private int[] MoveGenerator(OthelloGame othelloGame, OthelloGame.BoardStates whosTurn)
         {
-            int[] move;
+            byte[] move;
 
             int currentVal = 0;
             move = PredictBestMove(1, othelloGame, whosTurn, ref currentVal);//In the future will be changed to neural net's move choice

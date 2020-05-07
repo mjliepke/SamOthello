@@ -1,4 +1,5 @@
 ﻿using SamOthellop.Model;
+using SamOthellop.View;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -57,7 +58,7 @@ namespace SamOthellop
                     _boardPanels[i, j] = newPanel;
 
                     Color panelcolor = Color.Red;
-                    if (OthelloGame.BoardStateColors.TryGetValue(_myBoard.GetBoard()[i, j], out panelcolor))
+                    if (BoardColorDictionary.BoardStateColors.TryGetValue(_myBoard.GetBoard()[i, j], out panelcolor))
                     {
                         _boardPanels[i, j].ReColor(panelcolor);
                     }
@@ -84,7 +85,7 @@ namespace SamOthellop
                 for (int j = 0; j < OthelloGame.BOARD_SIZE; j++)
                 {
                     Color color;
-                    OthelloGame.BoardStateColors.TryGetValue(_myBoard.GetBoard()[i, j], out color);
+                    BoardColorDictionary.BoardStateColors.TryGetValue(_myBoard.GetBoard()[i, j], out color);
                     _boardPanels[i, j].ReColor(color);
                     _currentViewedMove = _myBoard.MovesMade();
                 }
@@ -98,14 +99,14 @@ namespace SamOthellop
             }
         }
 
-        private void RefreshControls(OthelloGame.BoardStates[,] bstate)
+        private void RefreshControls(BoardStates[,] bstate)
         {
             for (int i = 0; i < bstate.GetLength(0); i++)
             {
                 for (int j = 0; j < bstate.GetLength(1); j++)
                 {
                     Color color;
-                    OthelloGame.BoardStateColors.TryGetValue(bstate[i, j], out color);
+                    BoardColorDictionary.BoardStateColors.TryGetValue(bstate[i, j], out color);
                     _boardPanels[i, j].ReColor(color);
 
                 }
@@ -114,19 +115,19 @@ namespace SamOthellop
 
         private void OthelloPeice_Click(object sender, MouseEventArgs e)
         {
-            OthelloGame.BoardStates player = e.Button == MouseButtons.Left ? OthelloGame.BoardStates.black : OthelloGame.BoardStates.white;
+            BoardStates player = e.Button == MouseButtons.Left ? BoardStates.black : BoardStates.white;
             try
             {
                 PiecePanel thisPanel = (PiecePanel)sender;
                 if (!player.Equals(_myBoard.WhosTurn))
                 {
-                    if (player.Equals(OthelloGame.BoardStates.white))
+                    if (player.Equals(BoardStates.white))
                     {
                         BlackMoveLabel.Visible = true;
                         _twoSecondTimer.Elapsed += new System.Timers.ElapsedEventHandler(BlackMoveLabel_VisibilityFalse);
                         _twoSecondTimer.Enabled = true;
                     }
-                    else if (player.Equals(OthelloGame.BoardStates.black))
+                    else if (player.Equals(BoardStates.black))
                     {
                         WhiteMoveLabel.Visible = true;
 
@@ -134,7 +135,7 @@ namespace SamOthellop
                         _twoSecondTimer.Enabled = true;
                     }
                 }
-                _myBoard.MakeMove(player, new int[] { thisPanel.location[0], thisPanel.location[1] });
+                _myBoard.MakeMove(player, new byte[] { (byte)thisPanel.location[0], (byte)thisPanel.location[1] });
                 RefreshControls();
             }
             catch
@@ -292,32 +293,36 @@ namespace SamOthellop
             {
                 string path = @"C:\Users\mjlie\source\repos\SamOthellop\SamOthellop\Database";
 
-                //var totalstopwatch1 = Stopwatch.StartNew();
-                //List<OthelloGame> method1Games = FileIO.ReadAllGames(path);
-                //totalstopwatch1.Stop();
-                //Console.WriteLine("Elapsed time for Method1 : {0}", totalstopwatch1.Elapsed);
+                var totalstopwatch1 = Stopwatch.StartNew();
+                List<OthelloGame> method1Games = FileIO.ReadAllGames(path);
+                totalstopwatch1.Stop();
+                Console.WriteLine("Elapsed time for Method1 : {0}", totalstopwatch1.Elapsed);
+                var method1Count = method1Games.Count();
 
                 var totalstopwatch2 = Stopwatch.StartNew();
                 List<OthelloGame> method2Games = FileIO.ReadAllGames(path);
                 totalstopwatch2.Stop();
                 Console.WriteLine("Elapsed time for Method2 : {0}", totalstopwatch2.Elapsed);
+                var method2Count = method2Games.Count();
 
                 var totalstopwatch3 = Stopwatch.StartNew();
                 List<OthelloGame> method3Games = FileIO.ReadAllGames(path);
                 totalstopwatch3.Stop();
                 Console.WriteLine("Elapsed time for Method3 : {0}", totalstopwatch3.Elapsed);
+                var method3Count = method3Games.Count();
 
                 var totalstopwatch4 = Stopwatch.StartNew();
                 List<OthelloGame> method4Games = FileIO.ReadAllGames(path);
                 totalstopwatch4.Stop();
                 Console.WriteLine("Elapsed time for Method4 : {0}", totalstopwatch4.Elapsed);
+                var method4Count = method4Games.Count();
 
-                //Console.WriteLine("Method1: " + method1Games.Count + " games");
-                Console.WriteLine("Method2: " + method2Games.Count + " games");
-                Console.WriteLine("Method3: " + method3Games.Count + " games");
-                Console.WriteLine("Method4: " + method4Games.Count + " games");
+                Console.WriteLine("Method1: " + method1Count + " games");
+                Console.WriteLine("Method2: " + method2Count + " games");
+                Console.WriteLine("Method3: " + method3Count + " games");
+                Console.WriteLine("Method4: " + method4Count + " games");
 
-                //Console.WriteLine("Elapsed time for Method1 : {0}", totalstopwatch1.Elapsed);
+                Console.WriteLine("Elapsed time for Method1 : {0}", totalstopwatch1.Elapsed);
                 Console.WriteLine("Elapsed time for Method2 : {0}", totalstopwatch2.Elapsed);
                 Console.WriteLine("Elapsed time for Method3 : {0}", totalstopwatch3.Elapsed);
                 Console.WriteLine("Elapsed time for Method4 : {0}", totalstopwatch4.Elapsed);
@@ -329,7 +334,7 @@ namespace SamOthellop
         private void PreviousMoveButton_Click(object sender, EventArgs e)
         {
             _currentViewedMove -= 1;
-            OthelloGame.BoardStates[,] bstate = _myBoard.GetBoardAtMove(_currentViewedMove);
+            BoardStates[,] bstate = _myBoard.GetBoardAtMove(_currentViewedMove);
             RefreshControls(bstate);
         }
 
@@ -337,7 +342,7 @@ namespace SamOthellop
         {
             if (_currentViewedMove == _myBoard.MovesMade()) { return; }
             _currentViewedMove += 1;
-            OthelloGame.BoardStates[,] bstate = _myBoard.GetBoardAtMove(_currentViewedMove);
+            BoardStates[,] bstate = _myBoard.GetBoardAtMove(_currentViewedMove);
             RefreshControls(bstate);
         }
     }

@@ -105,8 +105,10 @@
   <ItemGroup>
     <Compile Include="Model\FileIO.cs" />
     <Compile Include="Model\NeuralNet.cs" />
-    <Compile Include="Model\OthelloBoard.cs" />
+    <Compile Include="Model\ObjectCopier.cs" />
+    <Compile Include="Model\OthelloGame.cs" />
     <Compile Include="Model\ThorGame.cs" />
+    <Compile Include="View\ColorDictionary.cs" />
     <Compile Include="View\OthelloForm.cs">
       <SubType>Form</SubType>
     </Compile>

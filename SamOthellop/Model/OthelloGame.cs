@@ -10,36 +10,29 @@ using System.Threading.Tasks;
 
 namespace SamOthellop
 {
-    [Serializable]
+
+    public enum BoardStates : Byte
+    {
+        white,
+        black,
+        empty
+    }
+    //[Serializable]
     class OthelloGame
     {
-        public enum BoardStates
-        {
-            white = 2,
-            black = 1,
-            empty = 0
-        }
-
-        public static Dictionary<BoardStates, System.Drawing.Color> BoardStateColors = new Dictionary<BoardStates, System.Drawing.Color>()
-        {
-            {BoardStates.black, System.Drawing.Color.Black },
-            {BoardStates.white, System.Drawing.Color.White },
-            {BoardStates.empty, System.Drawing.Color.DarkOliveGreen }
-        };
-
-        public const int BOARD_SIZE = 8;
-        public int MaxMoves { get; private set; }
-        public int FinalBlackTally { get; private set; }
-        public int FinalWhiteTally { get; private set; }
+        public const byte BOARD_SIZE = 8;
+        public byte MaxMoves { get; private set; }
+        public byte FinalBlackTally { get; private set; }
+        public byte FinalWhiteTally { get; private set; }
         public BoardStates FinalWinner { get; private set; }
         public BoardStates WhosTurn { get; private set; }
         BoardStates[,] Board;
-        BoardStates[][,] BoardHistory;
+        List<BoardStates[,]> BoardHistory;
 
-        public OthelloGame(int boardsize = 8)
+        public OthelloGame(byte boardsize = 8)
         {
             SetupGame();
-            MaxMoves = (boardsize * boardsize) - 4;//4 preoccupied spaces
+            MaxMoves = Convert.ToByte((boardsize * boardsize) - 4);//4 preoccupied spaces
         }
 
         public OthelloGame(ThorGame game)
@@ -52,11 +45,11 @@ namespace SamOthellop
             {
                 char colchar = play.ElementAt(0);
                 char rowchar = play.ElementAt(1);
-                int col = Int16.Parse((colchar - 'a' + 1).ToString()) - 1;//substract one to start @ index of 0
-                int row = Int16.Parse(rowchar.ToString()) - 1;
-                if (!MakeMove(new int[] { row, col }))
+                byte col = (byte)(Byte.Parse((colchar - 'a' + 1).ToString()) - 1);//substract one to start @ index of 0
+                byte row = (byte)(Byte.Parse(rowchar.ToString()) - 1);
+                if (!MakeMove(new byte[] { row, col }))
                 {
-                    MakeMove(new int[] { row, col });
+                    MakeMove(new byte[] { row, col });
                     throw new Exception("An invalid move was made while trying to recreate ThorGame");
                 }
             }
@@ -67,37 +60,13 @@ namespace SamOthellop
             return (OthelloGame)this.MemberwiseClone();
         }
 
-
-
         public OthelloGame DeepCopy()
         {
-            return ObjectCopier.Clone<OthelloGame>(this);
-            //OthelloGame game = (OthelloGame)this.MemberwiseClone();
-            //for (int i = 0; i < this.MovesMade(); i++)
-            //{
-            //    for (int j = 0; j < BOARD_SIZE; j++)
-            //    {
-            //        for (int k = 0; k < BOARD_SIZE; k++)
-            //        {
-            //            try
-            //            {
-            //                if (this.BoardHistory[i] != null)
-            //                {
-            //                    game.BoardHistory[i][j, k] = this.BoardHistory[i][j, k];
-            //                }
-            //            }
-            //            catch (NullReferenceException) { }
-            //        }
-            //    }
-            //}
-            //for (int i = 0; i < BOARD_SIZE; i++)
-            //{
-            //    for (int j = 0; j < BOARD_SIZE; j++)
-            //    {
-            //        game.Board[i, j] = this.Board[i, j];
-            //    }
-            //}
-            //return game;
+            //return ObjectCopier.Clone<OthelloGame>(this);
+            OthelloGame game = (OthelloGame)this.MemberwiseClone();
+            game.Board = GetBoardCopy(this.Board);
+            game.BoardHistory = GetBoardHistoryCopy(this.BoardHistory);
+            return game;
         }
 
         public BoardStates OpposingPlayer(BoardStates Player)
@@ -115,14 +84,13 @@ namespace SamOthellop
         public bool GameOver()
         {
             bool moveExists = false;
-            //for debugging:
-            int i, j;
-            for (i = 0; i < BOARD_SIZE; i++)
+
+            for (byte i = 0; i < BOARD_SIZE; i++)
             {
-                for (j = 0; j < BOARD_SIZE; j++)
+                for (byte j = 0; j < BOARD_SIZE; j++)
                 {
-                    moveExists |= ValidMove(BoardStates.black, new int[] { i, j });
-                    moveExists |= ValidMove(BoardStates.white, new int[] { i, j });
+                    moveExists |= ValidMove(BoardStates.black, new byte[] { i, j });
+                    moveExists |= ValidMove(BoardStates.white, new byte[] { i, j });
                     if (moveExists)
                     {
                         break;
@@ -151,23 +119,18 @@ namespace SamOthellop
             return playCount;
         }
 
-        public bool MakeMove(BoardStates player, int[] location)
+        public bool MakeMove(BoardStates player, byte[] location)
         {
             bool moveMade = false;
-            bool valid = true;
-            valid &= !GameOver();
-            valid &= OnBoard(location);
-            valid &= Board[location[0], location[1]].Equals(BoardStates.empty);
-            valid &= WhosTurn.Equals(player);
-            int[,] takenPieces = TakesPieces(player, location);
-            valid &= takenPieces.Length > 0;
+            List<byte[]> takenPeices;
+            bool valid = ValidMove(player, location, out takenPeices);
 
             if (valid)
             {
                 Board[location[0], location[1]] = player;
-                for (int i = 0; i < takenPieces.GetLength(0); i++)
+                for (int i = 0; i < takenPeices.Count(); i++)
                 {
-                    Board[takenPieces[i, 0], takenPieces[i, 1]] = player;
+                    Board[takenPeices[i][0], takenPeices[i][1]] = player;
                 }
 
                 if (PlayerHasMove(OpposingPlayer(player)))
@@ -175,17 +138,17 @@ namespace SamOthellop
                     WhosTurn = OpposingPlayer(player);//only switch whos turn it is if other player has moves avalible
                 }
 
-                BoardHistory[MovesMade()] = (BoardStates[,])Board.Clone();
+                BoardHistory.Add(GetBoardCopy(Board));
                 moveMade = true;
             }
             else
             {
-                int debugLocation = 0;//to stop debugger on
+                int debugLocation = 0;//to stop debugger on invalid move
             }
             return moveMade;
         }
 
-        public bool MakeMove(int[] location)
+        public bool MakeMove(byte[] location)
         {
             BoardStates player = WhosTurn;
             return MakeMove(player, location);
@@ -193,13 +156,14 @@ namespace SamOthellop
 
         public void MakeRandomMove(BoardStates player)
         {
-            int[,] possibleMoves = new int[MaxMoves - MovesMade(), 2];
+            byte[,] possibleMoves = new byte[MaxMoves - MovesMade(), 2];
             int possibleMoveCount = 0;
-            for (int i = 0; i < BOARD_SIZE; i++)
+            for (byte i = 0; i < BOARD_SIZE; i++)
             {
-                for (int j = 0; j < BOARD_SIZE; j++)
+                for (byte j = 0; j < BOARD_SIZE; j++)
                 {
-                    if (ValidMove(player, new int[] { i, j }))
+                    List<byte[]> takenPeices;
+                    if (ValidMove(player, new byte[] { i, j }, out takenPeices))
                     {
                         possibleMoves[possibleMoveCount, 0] = i;
                         possibleMoves[possibleMoveCount, 1] = j;
@@ -215,7 +179,7 @@ namespace SamOthellop
             Random rndGenerator = new Random();
             int rnd = (int)Math.Floor(rndGenerator.NextDouble() * possibleMoveCount);
 
-            MakeMove(player, new int[] { possibleMoves[rnd, 0], possibleMoves[rnd, 1] });
+            MakeMove(player, new byte[] { possibleMoves[rnd, 0], possibleMoves[rnd, 1] });
         }
 
         public void MakeRandomMove()
@@ -229,16 +193,37 @@ namespace SamOthellop
             }
         }
 
-        public bool ValidMove(BoardStates player, int[] location, bool playerTurn = false)
+        public bool ValidMove(BoardStates player, byte[] location, out List<byte[]> takenPeices, bool playerTurn = false)
         {
             bool valid = true;
-
+            //valid &= !GameOver();
             valid &= OnBoard(location);
-            if (!valid) return valid;
+            if (!valid)
+            {
+                takenPeices = null;
+                return valid;
+            }
             valid &= Board[location[0], location[1]].Equals(BoardStates.empty);
             if (playerTurn) valid &= WhosTurn.Equals(player);
-            int[,] takenPieces = TakesPieces(player, location);
-            valid &= takenPieces.Length > 0;
+            takenPeices = TakesPieces(player, location);
+            valid &= takenPeices.Count() > 0;
+
+            return valid;
+        }
+
+        public bool ValidMove(BoardStates player, byte[] location, bool playerTurn = false)
+        {
+            bool valid = true;
+            //valid &= !GameOver();
+            valid &= OnBoard(location);
+            if (!valid)
+            {
+                return valid;
+            }
+            valid &= Board[location[0], location[1]].Equals(BoardStates.empty);
+            if (playerTurn) valid &= WhosTurn.Equals(player);
+            List<byte[]> takenPeices = TakesPieces(player, location);
+            valid &= takenPeices.Count() > 0;
 
             return valid;
         }
@@ -376,6 +361,14 @@ namespace SamOthellop
 
             return gameList;
         }
+
+        public static BoardStates GetCurrentLeader(OthelloGame game)
+        {
+            BoardStates leader = BoardStates.empty;
+            leader = game.GetPieceCount(BoardStates.white) > game.GetPieceCount(BoardStates.black)
+                ? BoardStates.white : BoardStates.black;
+            return leader;
+        }
         //**************************Get Methods****************************   
 
         public BoardStates[,] GetBoardAtMove(int move)
@@ -398,11 +391,11 @@ namespace SamOthellop
         public bool[,] GetPlayableStateArray(BoardStates player)
         {
             bool[,] bstates = new bool[BOARD_SIZE, BOARD_SIZE];
-            for (int i = 0; i < BOARD_SIZE; i++)
+            for (byte i = 0; i < BOARD_SIZE; i++)
             {
-                for (int j = 0; j < BOARD_SIZE; j++)
+                for (byte j = 0; j < BOARD_SIZE; j++)
                 {
-                    bstates[i, j] = ValidMove(player, new int[] { i, j }) ? true : false;
+                    bstates[i, j] = ValidMove(player, new byte[] { i, j }) ? true : false;
                 }
             }
             return bstates;
@@ -421,25 +414,26 @@ namespace SamOthellop
         public bool[] GetPlayableStateList(BoardStates player)
         {
             bool[] bstates = new bool[BOARD_SIZE * BOARD_SIZE];
-            for (int i = 0; i < BOARD_SIZE; i++)
+            for (byte i = 0; i < BOARD_SIZE; i++)
             {
-                for (int j = 0; j < BOARD_SIZE; j++)
+                for (byte j = 0; j < BOARD_SIZE; j++)
                 {
-                    bstates[i + j] = ValidMove(player, new int[] { i, j }) ? true : false;
+                    bstates[i + j] = ValidMove(player, new byte[] { i, j }) ? true : false;
                 }
             }
             return bstates;
         }
 
-        public List<int[]> GetPossiblePlayList()
+        public List<byte[]> GetPossiblePlayList()
         {
-            List<int[]> possiblePlays = new List<int[]>();
-            for(int i = 0; i < BOARD_SIZE; i++)
+            List<byte[]> possiblePlays = new List<byte[]>();
+            for (byte i = 0; i < BOARD_SIZE; i++)
             {
-                for(int j = 0; j < BOARD_SIZE; j++)
+                for (byte j = 0; j < BOARD_SIZE; j++)
                 {
-                    if(ValidMove(WhosTurn, new int[] { i, j })){
-                        possiblePlays.Add(new int[] { i, j });
+                    if (ValidMove(WhosTurn, new byte[] { i, j }))
+                    {
+                        possiblePlays.Add(new byte[] { i, j });
                     }
                 }
             }
@@ -449,11 +443,11 @@ namespace SamOthellop
         public bool PlayerHasMove(BoardStates player)
         {
             bool hasMove = false;
-            for (int i = 0; i < BOARD_SIZE; i++)
+            for (byte i = 0; i < BOARD_SIZE; i++)
             {
-                for (int j = 0; j < BOARD_SIZE; j++)
+                for (byte j = 0; j < BOARD_SIZE; j++)
                 {
-                    if (ValidMove(player, new int[] { i, j }))
+                    if (ValidMove(player, new byte[] { i, j }))
                     {
                         hasMove = true;
                         return hasMove;
@@ -475,62 +469,45 @@ namespace SamOthellop
 
         //**************************Private Methods****************************
 
-        private int[,] TakesPieces(BoardStates player, int[] location)
+        private List<byte[]> TakesPieces(BoardStates player, byte[] location)
         {
-            int[,] taken = new int[BOARD_SIZE * BOARD_SIZE, 2];//array of all pieces to be flipped
-            int takenCount = 0;
 
-            int minX = location[0] > 0 ? location[0] - 1 : 0;
-            int minY = location[1] > 0 ? location[1] - 1 : 0;
-            int maxX = location[0] + 2 < BOARD_SIZE ? location[0] + 1 : BOARD_SIZE - 1;
-            int maxY = location[1] + 2 < BOARD_SIZE ? location[1] + 1 : BOARD_SIZE - 1;
+            List<byte[]> taken = new List<byte[]>();//array of all pieces to be flipped
 
-            for (int x = minX; x <= maxX; x++)
+            byte minX = location[0] > 0 ? (byte)(location[0] - 1) : (byte)0;
+            byte minY = location[1] > 0 ? (byte)(location[1] - 1) : (byte)0;
+            byte maxX = location[0] + 2 < BOARD_SIZE ? (byte)(location[0] + 1) : (byte)(BOARD_SIZE - 1);
+            byte maxY = location[1] + 2 < BOARD_SIZE ? (byte)(location[1] + 1) : (byte)(BOARD_SIZE - 1);
+
+            for (byte x = minX; x <= maxX; x++)
             {
-                for (int y = minY; y <= maxY; y++)
+                for (byte y = minY; y <= maxY; y++)
                 {
-                    int[,] subtaken = new int[BOARD_SIZE, 2];
-                    int subtakenCount = 0;
+                    // int subtakenCount = 0;
 
                     if ((x != location[0] || y != location[1]) && Board[x, y].Equals(OpposingPlayer(player)))
                     {
-                        int[] direction = new int[] { x - location[0], y - location[1] };
-                        // if (direction[0] == 0 && direction[1] == 0) break; //Can't test current location.. infinite loop
+                        sbyte[] direction = new sbyte[] { (sbyte)(x - location[0]), (sbyte)(y - location[1]) };
 
-                        int[] searchedLocation = new int[] { x, y };
+                        byte[] searchedLocation = new byte[] { x, y };
+                        List<byte[]> subTaken = new List<byte[]>();
 
                         while (OnBoard(searchedLocation) && Board[searchedLocation[0], searchedLocation[1]].Equals(OpposingPlayer(player)))
                         {
-                            subtaken[subtakenCount, 0] = searchedLocation[0];
-                            subtaken[subtakenCount, 1] = searchedLocation[1];
-                            subtakenCount++;
-                            searchedLocation[0] += direction[0];
-                            searchedLocation[1] += direction[1];
 
+                            subTaken.Add(searchedLocation);
+                            searchedLocation = new byte[] { (byte)(searchedLocation[0] + direction[0]),
+                                (byte)(searchedLocation[1] + direction[1]) };
                         }
 
-                        if (!OnBoard(searchedLocation) || Board[searchedLocation[0], searchedLocation[1]].Equals(BoardStates.empty))
+                        if (OnBoard(searchedLocation) && Board[searchedLocation[0], searchedLocation[1]].Equals(player))
                         {
-                            subtakenCount = 0;
+                           taken = taken.Concat(subTaken).ToList();
                         }
                     }
-
-                    for (int i = 0; i < subtakenCount; i++)
-                    {
-                        taken[i + takenCount, 0] = subtaken[i, 0];
-                        taken[i + takenCount, 1] = subtaken[i, 1];
-                    }
-                    takenCount += subtakenCount;
                 }
             }
-
-            int[,] trimmedTaken = new int[takenCount, 2];
-            for (int i = 0; i < takenCount; i++)
-            {
-                trimmedTaken[i, 0] = taken[i, 0];
-                trimmedTaken[i, 1] = taken[i, 1];
-            }
-            return trimmedTaken;
+            return taken;
         }
 
         private bool[,] GetStateArray(BoardStates bstate)
@@ -568,7 +545,7 @@ namespace SamOthellop
 
         private void SetupGame()
         {
-            BoardHistory = new BoardStates[61][,];//60 moves + initial
+            BoardHistory = new List<BoardStates[,]>();//60 moves + initial
             Board = new BoardStates[BOARD_SIZE, BOARD_SIZE];
             for (int i = 0; i < BOARD_SIZE; i++)
             {
@@ -584,18 +561,41 @@ namespace SamOthellop
 
             WhosTurn = BoardStates.black;
             FinalWinner = BoardStates.empty;
-            BoardHistory[0] = (BoardStates[,])Board.Clone();
+            BoardHistory.Add(GetBoardCopy(this.Board));
         }
 
-        private bool OnBoard(int[] location)
+        private bool OnBoard(byte[] location)
         {
             return (location[0] >= 0 && location[0] < BOARD_SIZE && location[1] >= 0 && location[1] < BOARD_SIZE);
         }
 
+        private static BoardStates[,] GetBoardCopy(BoardStates[,] board)
+        {
+            BoardStates[,] boardCopy = new BoardStates[BOARD_SIZE, BOARD_SIZE];
+            for (int i = 0; i < BOARD_SIZE; i++)
+            {
+                for (int j = 0; j < BOARD_SIZE; j++)
+                {
+                    boardCopy[i, j] = board[i, j];
+                }
+            }
+            return boardCopy;
+        }
+
+        private static List<BoardStates[,]> GetBoardHistoryCopy(List<BoardStates[,]> boardHistory)
+        {
+            List<BoardStates[,]> historyCopy = new List<BoardStates[,]>();
+            foreach (BoardStates[,] board in boardHistory)
+            {
+                historyCopy.Add(GetBoardCopy(board));
+            }
+            return historyCopy;
+        }
+
         private void InitializeEndOfGameAttributes()
         {
-            int wtally = 0;
-            int btally = 0;
+            byte wtally = 0;
+            byte btally = 0;
             for (int i = 0; i < BOARD_SIZE; i++)
             {
                 for (int j = 0; j < BOARD_SIZE; j++)

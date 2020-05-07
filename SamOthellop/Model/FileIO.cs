@@ -78,7 +78,6 @@ namespace SamOthellop.Model
             List<string> files = GetFiles(path);
 
             object gameTransferLock = new object();
-            List<Task> gameTransferTask = new List<Task>();
 
             foreach (var file in files) //For each file, read games 
             {
@@ -110,13 +109,13 @@ namespace SamOthellop.Model
                     }));
 
                 }
-
                 Task.WaitAll(fileTransferTask.ToArray());
-                lock (gameTransferLock)
+                foreach(Task t in fileTransferTask)
                 {
-                    gameTransferTask = gameTransferTask.Concat(fileTransferTask).ToList();
-                    gameRepo = gameRepo.Concat(fileGameRepo).ToList();
+                    t.Dispose();
                 }
+                    gameRepo = gameRepo.Concat(fileGameRepo).ToList();
+
                 if (8 * games.Count != fileGameRepo.Count)
                 {
                     Console.WriteLine("Games have been lost, " + fileGameRepo.Count + " / " + (8 * games.Count) + " games  transferred : " + ((double)fileGameRepo.Count / (8 * games.Count)) + " %");
