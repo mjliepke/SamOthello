@@ -24,73 +24,104 @@ namespace SamOthellop.Model
 
         public void StartOthelloTest()
         {
-            int training_epochs = 1000;
-            float learning_rate = .05f;
-            int display_step = 100;
+            //int training_epochs = 1000;
+            //float learning_rate = .05f;
+            //int display_step = 100;
 
 
         }
 
-        public byte[] PredictBestMove(int futureDepth, OthelloGame othelloGame, BoardStates player, ref int treeVal)
-        ///
-        ///Looks futureDepth moves into the future, and selects the move that gains the most peices  
-        ///At heart, is a Min-Max function
-        ///
+        public static int MinimaxAlphaBeta(OthelloGame board, int depth, int a, int b, BoardStates player, bool isMaxPlayer)
         {
-            byte[] bestMove = new byte[2];
-            int topScore = 0;
+            // The heart of our AI. Minimax algorithm with alpha-beta pruning to speed up computation.
+            // Higher search depths = greater difficulty.
+            //from oliverzh200/reversi https://github.com/oliverzh2000/reversi
 
-            List<byte[]> possibleMoves = othelloGame.GetPossiblePlayList();
-
-           if(futureDepth == 1)
+            if (depth == 0 || board.GameOver())
             {
-                int minScore = 0;
-                foreach (byte[] move in possibleMoves)
+                return BoardNeuralNet.HeuristicEval(player, board);
+            }
+            int bestScore;
+            if (isMaxPlayer) bestScore = int.MinValue;
+            else bestScore = int.MaxValue;
+            List<byte[]> validMoves = board.GetPossiblePlayList();
+            if (validMoves.Count > 0)
+            {
+                foreach (byte[] move in validMoves)
                 {
-                    OthelloGame treeGame = othelloGame.DeepCopy();
-                    if(!treeGame.MakeMove(move))
+                    OthelloGame childBoard = board.DeepCopy();
+                    childBoard.MakeMove(move);
+                    int nodeScore = MinimaxAlphaBeta(childBoard, depth - 1, a, b, OthelloGame.OpposingPlayer(player), !isMaxPlayer);
+                    if (isMaxPlayer)
                     {
-                        throw new Exception("PredictBestMove tried to play an invalid move");
+                        bestScore = Math.Max(bestScore, nodeScore);
+                        a = Math.Max(bestScore, a);
                     }
-                    int treeScore = treeGame.GetPieceCount(player);
-                    if (treeScore > topScore) //This is the Max tree
+                    else
                     {
-                        bestMove = move;
-                        topScore = treeScore;
-                    }else if(treeScore < minScore)
+                        bestScore = Math.Min(bestScore, nodeScore);
+                        b = Math.Min(bestScore, b);
+                    }
+                    if (b <= a)
                     {
-
+                        break;
                     }
                 }
             }
-            else if (futureDepth > 1)
+            else
             {
-                foreach(byte[] move in possibleMoves)
+                return MinimaxAlphaBeta(board, depth, a, b, OthelloGame.OpposingPlayer(player), !isMaxPlayer);
+            }
+            return bestScore;
+        }
+
+        public static byte[] PredictBestMove(int depth, OthelloGame game, BoardStates player)
+        {
+            List<byte[]> moves = game.GetPossiblePlayList();
+
+            byte[] bestMove = moves[0];
+            int bestScore = int.MinValue;
+
+            foreach (byte[] move in moves)
+            {
+                OthelloGame testGame = game.DeepCopy();
+                int thisScore = MinimaxAlphaBeta(testGame, depth, int.MinValue, int.MaxValue, player, true);
+                if (thisScore > bestScore)
                 {
-                    byte[] treeBestMove = new byte[2];
-                    OthelloGame treeGame = othelloGame.DeepCopy();
-                    treeGame.MakeMove(move);
-                    int treeScore =0;
-                    treeBestMove = PredictBestMove(futureDepth - 1, treeGame, player, ref treeScore);
-                    if(treeScore > topScore)
-                    {
-                        bestMove = move;
-                        topScore = treeScore;
-                    }
+                    bestScore = thisScore;
+                    bestMove = move;
                 }
             }
-            treeVal = topScore;
             return bestMove;
         }
 
-        private int[] MoveGenerator(OthelloGame othelloGame, OthelloGame.BoardStates whosTurn)
+        private static int HeuristicEval(BoardStates player, OthelloGame game)
         {
-            byte[] move;
+            const int coinDiffWeight = 1;
+            const int cornerDiffWeight = 1;
+            const int nearCornerDiffWeight = -1;
+            const int avalibleMoveDiffWeight = 1;
+            const int nonTurnableCoinDiffWeight = 1;
 
-            int currentVal = 0;
-            move = PredictBestMove(1, othelloGame, whosTurn, ref currentVal);//In the future will be changed to neural net's move choice
+            if (game.GameOver()) return CompleteEval(player, game);
 
-            return move;
+            int value = 0;
+            value += coinDiffWeight * (game.GetPieceCount(player) - game.GetPieceCount(OthelloGame.OpposingPlayer(player)));
+            value += cornerDiffWeight * (game.GetCornerCount(player) - game.GetCornerCount(OthelloGame.OpposingPlayer(player)));
+            value += nearCornerDiffWeight * (game.GetAdjCornerCount(player) - game.GetAdjCornerCount(OthelloGame.OpposingPlayer(player)));
+            value += avalibleMoveDiffWeight * (game.GetPossiblePlayList(player).Count() - game.GetPossiblePlayList(OthelloGame.OpposingPlayer(player)).Count());
+            //value ++ nonTurnableCoinDiffWeight * (game.)
+
+            return value;
+        }
+
+        private static int CompleteEval(BoardStates player, OthelloGame game)
+        {
+            if (game.FinalWinner == player)
+            {
+                return int.MaxValue;
+            }
+            else return int.MinValue;
         }
 
         public void StartTest()
@@ -161,7 +192,7 @@ namespace SamOthellop.Model
                             new FeedItem(X, train_X),
                             new FeedItem(Y, train_Y));
 
-                            Console.WriteLine($"Epoch: {epoch + 1} cost={c} " + $"W={sess.run(W)} b={sess.run(b)}");
+                        Console.WriteLine($"Epoch: {epoch + 1} cost={c} " + $"W={sess.run(W)} b={sess.run(b)}");
 
                     }
                 }

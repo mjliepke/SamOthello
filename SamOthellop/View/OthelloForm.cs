@@ -17,7 +17,7 @@ namespace SamOthellop
 {
     public partial class OthelloForm : Form
     {
-        private OthelloGame _myBoard;
+        private OthelloGame _myGame;
         private PiecePanel[,] _boardPanels;
         private System.Timers.Timer _twoSecondTimer;
         private BoardNeuralNet _net;
@@ -38,7 +38,7 @@ namespace SamOthellop
         }
         private void SetupBoard()
         {
-            _myBoard = new OthelloGame();
+            _myGame = new OthelloGame();
             _boardPanels = new PiecePanel[OthelloGame.BOARD_SIZE, OthelloGame.BOARD_SIZE];
             _currentViewedMove = 0;
             int tileSize = ((Size.Width > Size.Height) ? Size.Height - 45 : Size.Width - 45) / OthelloGame.BOARD_SIZE;
@@ -58,7 +58,7 @@ namespace SamOthellop
                     _boardPanels[i, j] = newPanel;
 
                     Color panelcolor = Color.Red;
-                    if (BoardColorDictionary.BoardStateColors.TryGetValue(_myBoard.GetBoard()[i, j], out panelcolor))
+                    if (BoardColorDictionary.BoardStateColors.TryGetValue(_myGame.GetBoard()[i, j], out panelcolor))
                     {
                         _boardPanels[i, j].ReColor(panelcolor);
                     }
@@ -74,8 +74,8 @@ namespace SamOthellop
 
         private void SetupProgressBar()
         {
-            GameCompletionProgressBar.Maximum = _myBoard.MaxMoves;
-            GameCompletionProgressBar.Value = _myBoard.MovesMade();
+            GameCompletionProgressBar.Maximum = _myGame.MaxMoves;
+            GameCompletionProgressBar.Value = _myGame.MovesMade();
         }
 
         private void RefreshControls()
@@ -85,13 +85,13 @@ namespace SamOthellop
                 for (int j = 0; j < OthelloGame.BOARD_SIZE; j++)
                 {
                     Color color;
-                    BoardColorDictionary.BoardStateColors.TryGetValue(_myBoard.GetBoard()[i, j], out color);
+                    BoardColorDictionary.BoardStateColors.TryGetValue(_myGame.GetBoard()[i, j], out color);
                     _boardPanels[i, j].ReColor(color);
-                    _currentViewedMove = _myBoard.MovesMade();
+                    _currentViewedMove = _myGame.MovesMade();
                 }
             }
 
-            if (_myBoard.GameOver())
+            if (_myGame.GameOver())
             {
                 GameOverLabel.Visible = true;
                 _twoSecondTimer.Elapsed += new System.Timers.ElapsedEventHandler(GameOver_VisibilityFalse);
@@ -119,7 +119,7 @@ namespace SamOthellop
             try
             {
                 PiecePanel thisPanel = (PiecePanel)sender;
-                if (!player.Equals(_myBoard.WhosTurn))
+                if (!player.Equals(_myGame.WhosTurn))
                 {
                     if (player.Equals(BoardStates.white))
                     {
@@ -135,14 +135,14 @@ namespace SamOthellop
                         _twoSecondTimer.Enabled = true;
                     }
                 }
-                _myBoard.MakeMove(player, new byte[] { (byte)thisPanel.location[0], (byte)thisPanel.location[1] });
+                _myGame.MakeMove(player, new byte[] { (byte)thisPanel.location[0], (byte)thisPanel.location[1] });
                 RefreshControls();
             }
             catch
             {
                 throw new NotSupportedException("OthelloPeice_Click is not to be used with a control other than a PiecePanel");
             }
-            GameCompletionProgressBar.Value = _myBoard.MovesMade();
+            GameCompletionProgressBar.Value = _myGame.MovesMade();
         }
 
         private void BlackMoveLabel_VisibilityFalse(object sender, EventArgs e)
@@ -176,7 +176,7 @@ namespace SamOthellop
 
         private void RandomMoveButton_Click(object sender, EventArgs e)
         {
-            _myBoard.MakeRandomMove();
+            _myGame.MakeRandomMove();
             RefreshControls();
         }
 
@@ -185,9 +185,9 @@ namespace SamOthellop
             EnableControlButtons(false);
             new Thread(() =>
             {
-                while (!_myBoard.GameOver())
+                while (!_myGame.GameOver())
                 {
-                    _myBoard.MakeRandomMove();
+                    _myGame.MakeRandomMove();
                 }
                 Invoke(new Action(() =>
                 {
@@ -199,7 +199,7 @@ namespace SamOthellop
 
         private void ClearBoardButton_Click(object sender, EventArgs e)
         {
-            _myBoard.ResetBoard();
+            _myGame.ResetBoard();
             GameOverLabel.Visible = false;
             RefreshControls();
         }
@@ -224,15 +224,15 @@ namespace SamOthellop
             {
                 for (int i = 0; i < gameCount; i++)
                 {
-                    while (!_myBoard.GameOver())
+                    while (!_myGame.GameOver())
                     {
-                        _myBoard.MakeRandomMove();
+                        _myGame.MakeRandomMove();
                     }
                     Invoke(new Action(() =>
                     {
                         RefreshControls();
                     }));
-                    _myBoard.ResetBoard();
+                    _myGame.ResetBoard();
                     Thread.Sleep(5);
                 }
                 Invoke(new Action(() =>
@@ -253,7 +253,7 @@ namespace SamOthellop
                     b.Enabled = enable;
                 }
             }
-            foreach(Control b in ControlGroupBox.Controls)
+            foreach (Control b in ControlGroupBox.Controls)
             {
                 if (b.GetType() == typeof(Button))
                 {
@@ -277,7 +277,7 @@ namespace SamOthellop
             new Thread(() =>
             {
                 int unused = 0;
-                _myBoard.MakeMove(_myBoard.WhosTurn, _net.PredictBestMove(Convert.ToInt32(MoveDepth.Text), _myBoard, _myBoard.WhosTurn, ref unused));
+                _myGame.MakeMove(_myGame.WhosTurn, BoardNeuralNet.PredictBestMove(Convert.ToInt32(MoveDepth.Text), _myGame, _myGame.WhosTurn));
 
                 Invoke(new Action(() =>
                 {
@@ -334,17 +334,74 @@ namespace SamOthellop
         private void PreviousMoveButton_Click(object sender, EventArgs e)
         {
             _currentViewedMove -= 1;
-            BoardStates[,] bstate = _myBoard.GetBoardAtMove(_currentViewedMove);
+            BoardStates[,] bstate = _myGame.GetBoardAtMove(_currentViewedMove);
             RefreshControls(bstate);
         }
 
         private void NextMoveButton_Click(object sender, EventArgs e)
         {
-            if (_currentViewedMove == _myBoard.MovesMade()) { return; }
+            if (_currentViewedMove == _myGame.MovesMade()) { return; }
             _currentViewedMove += 1;
-            BoardStates[,] bstate = _myBoard.GetBoardAtMove(_currentViewedMove);
+            BoardStates[,] bstate = _myGame.GetBoardAtMove(_currentViewedMove);
             RefreshControls(bstate);
+        }
+
+        private void MiniMaxTestButton_Click(object sender, EventArgs e)
+        {
+
+            new Thread(() =>
+            {
+                const BoardStates myPlayer = BoardStates.black;
+                const int testCount = 25;
+                const int minimaxDepth = 3;
+                object wonGamesLock = new object();
+                int wonGames = 0;
+
+                //Parallel.For(0, testCount, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount - 1 }, index =>
+                //{
+                for (int index = 0; index < testCount; index++)
+                {
+                    OthelloGame testGame = new OthelloGame();
+                    _myGame = testGame;
+                    while (!testGame.GameOver())
+                    {
+                        if (testGame.WhosTurn == OthelloGame.OpposingPlayer(myPlayer))
+                        {
+                            testGame.MakeRandomMove();
+                            Invoke(new Action(() =>
+                            {
+                                RefreshControls();
+                            }));
+                        }
+                        else
+                        {
+                            byte[] move = BoardNeuralNet.PredictBestMove(minimaxDepth, testGame, myPlayer);
+                            testGame.MakeMove(move);
+                            Invoke(new Action(() =>
+                            {
+                                RefreshControls();
+                            }));
+                        }
+                    }
+                    if (testGame.GameOver())//just gotta check
+                    {
+                        if (testGame.FinalWinner == myPlayer)
+                        {
+                            lock (wonGamesLock) { wonGames++; }
+                        }
+                        Console.WriteLine("Finished Game " + index + ", " + testGame.FinalWinner.ToString() + " won");
+                    }
+                    else
+                    {
+                        throw new Exception("MiniMax Testing didn't complete a game");
+                    }
+                }
+                //});
+
+                Console.WriteLine("Won " + wonGames + " / " + testCount + " games, " + ((double)wonGames / testCount) * 100 + " %");
+            }).Start();
         }
     }
 }
+
 

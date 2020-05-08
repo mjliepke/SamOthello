@@ -33,7 +33,6 @@
             this.NextMoveButton = new System.Windows.Forms.Button();
             this.PreviousMoveButton = new System.Windows.Forms.Button();
             this.FileLoadButton = new System.Windows.Forms.Button();
-            this.FileLoadTextBox = new System.Windows.Forms.TextBox();
             this.MoveDepth = new System.Windows.Forms.TextBox();
             this.EducatedPlayButton = new System.Windows.Forms.Button();
             this.RunNetButton = new System.Windows.Forms.Button();
@@ -47,6 +46,7 @@
             this.gameProgressLabel = new System.Windows.Forms.Label();
             this.GameCompletionProgressBar = new System.Windows.Forms.ProgressBar();
             this.GameOverLabel = new System.Windows.Forms.Label();
+            this.MiniMaxTextButton = new System.Windows.Forms.Button();
             this.ControlGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -62,10 +62,10 @@
             // 
             // ControlGroupBox
             // 
+            this.ControlGroupBox.Controls.Add(this.MiniMaxTextButton);
             this.ControlGroupBox.Controls.Add(this.NextMoveButton);
             this.ControlGroupBox.Controls.Add(this.PreviousMoveButton);
             this.ControlGroupBox.Controls.Add(this.FileLoadButton);
-            this.ControlGroupBox.Controls.Add(this.FileLoadTextBox);
             this.ControlGroupBox.Controls.Add(this.MoveDepth);
             this.ControlGroupBox.Controls.Add(this.EducatedPlayButton);
             this.ControlGroupBox.Controls.Add(this.RunNetButton);
@@ -109,20 +109,13 @@
             // 
             // FileLoadButton
             // 
-            this.FileLoadButton.Location = new System.Drawing.Point(240, 363);
+            this.FileLoadButton.Location = new System.Drawing.Point(170, 362);
             this.FileLoadButton.Name = "FileLoadButton";
-            this.FileLoadButton.Size = new System.Drawing.Size(55, 23);
+            this.FileLoadButton.Size = new System.Drawing.Size(103, 23);
             this.FileLoadButton.TabIndex = 16;
             this.FileLoadButton.Text = "LoadGames";
             this.FileLoadButton.UseVisualStyleBackColor = true;
             this.FileLoadButton.Click += new System.EventHandler(this.FileLoadButton_Click);
-            // 
-            // FileLoadTextBox
-            // 
-            this.FileLoadTextBox.Location = new System.Drawing.Point(157, 365);
-            this.FileLoadTextBox.Name = "FileLoadTextBox";
-            this.FileLoadTextBox.Size = new System.Drawing.Size(77, 20);
-            this.FileLoadTextBox.TabIndex = 15;
             // 
             // MoveDepth
             // 
@@ -257,6 +250,16 @@
             this.GameOverLabel.Text = "GAME OVER";
             this.GameOverLabel.Visible = false;
             // 
+            // MiniMaxTextButton
+            // 
+            this.MiniMaxTextButton.Location = new System.Drawing.Point(170, 391);
+            this.MiniMaxTextButton.Name = "MiniMaxTextButton";
+            this.MiniMaxTextButton.Size = new System.Drawing.Size(103, 23);
+            this.MiniMaxTextButton.TabIndex = 19;
+            this.MiniMaxTextButton.Text = "Test MiniMax";
+            this.MiniMaxTextButton.UseVisualStyleBackColor = true;
+            this.MiniMaxTextButton.Click += new System.EventHandler(this.MiniMaxTestButton_Click);
+            // 
             // OthelloForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -293,9 +296,9 @@
         private System.Windows.Forms.Button EducatedPlayButton;
         private System.Windows.Forms.TextBox MoveDepth;
         private System.Windows.Forms.Button FileLoadButton;
-        private System.Windows.Forms.TextBox FileLoadTextBox;
         private System.Windows.Forms.Button NextMoveButton;
         private System.Windows.Forms.Button PreviousMoveButton;
+        private System.Windows.Forms.Button MiniMaxTextButton;
     }
 }
 
