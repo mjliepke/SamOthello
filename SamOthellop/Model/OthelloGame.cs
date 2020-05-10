@@ -12,7 +12,7 @@ namespace SamOthellop.Model
 {
 
 
-    class OthelloGame : BoardBase
+    public class OthelloGame : BoardBase
     {
 
         public OthelloGame(byte boardsize = 8) : base()

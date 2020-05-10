@@ -5,14 +5,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SamOthellop.Model.Agents;
 
 namespace SamOthellop.Model.Genetic
 {
     public class EvaluationFitness : IFitness
     {
         int TEST_COUNT;
-        public EvaluationFitness(int testCount = 50) : base()
+        IOthelloAgent opposingAgent;
+        public EvaluationFitness(IOthelloAgent agent, int testCount = 100) : base()
         {
+            opposingAgent = agent;
             TEST_COUNT = testCount;
         }
 
@@ -35,6 +38,7 @@ namespace SamOthellop.Model.Genetic
 
                 OthelloGame othelloGame = new OthelloGame();
                 MinMaxAgent minMaxAgent = new MinMaxAgent(genes, 1);
+  
 
                 while (!othelloGame.GameComplete)
                 {
@@ -44,7 +48,7 @@ namespace SamOthellop.Model.Genetic
                     }
                     else
                     {
-                        othelloGame.MakeRandomMove(~player);
+                        othelloGame.MakeMove(opposingAgent.MakeMove(othelloGame, ~player));
                     }
                 }
                 if (othelloGame.GameComplete)//just gotta check
@@ -71,7 +75,7 @@ namespace SamOthellop.Model.Genetic
                 // });
             }
             fitness = (double)wonCount / TEST_COUNT;
-            System.Diagnostics.Debug.WriteLine("Fitness: " + fitness);
+            //System.Diagnostics.Debug.WriteLine("Fitness: " + fitness);
             return fitness;
         }
 

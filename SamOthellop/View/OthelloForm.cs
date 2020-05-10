@@ -342,7 +342,7 @@ namespace SamOthellop
             EnableControlButtons(false);
             new Thread(() =>
             {
-                Evolution.RunGeneticAlgorithm();
+                Evolution.RunRecursiveGeneticAlgorithm(10);
                 Invoke(new Action(() =>
                 {
                     EnableControlButtons();

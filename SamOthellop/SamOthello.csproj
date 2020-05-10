@@ -35,7 +35,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>true</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -124,18 +124,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Model\FileIO.cs" />
-    <Compile Include="Model\Genetic\ChromosomeMutation.cs" />
-    <Compile Include="Model\Genetic\EvaluationChromosome.cs" />
-    <Compile Include="Model\Genetic\EvaluationFitness.cs" />
-    <Compile Include="Model\Genetic\Evolution.cs" />
-    <Compile Include="Model\IOthelloAgent.cs" />
-    <Compile Include="Model\MinMaxAgent.cs" />
-    <Compile Include="Model\NeuralNet.cs" />
+    <Compile Include="Model\Agents\GreedyAgent.cs" />
+    <Compile Include="Model\Agents\Heuristic\HeuristicAgent.cs" />
+    <Compile Include="Model\Agents\RandomAgent.cs" />
+    <Compile Include="Model\IO\FileIO.cs" />
+    <Compile Include="Model\Agents\Genetic\ChromosomeMutation.cs" />
+    <Compile Include="Model\Agents\Genetic\EvaluationChromosome.cs" />
+    <Compile Include="Model\Agents\Genetic\EvaluationFitness.cs" />
+    <Compile Include="Model\Agents\Genetic\Evolution.cs" />
+    <Compile Include="Model\Agents\IOthelloAgent.cs" />
+    <Compile Include="Model\Agents\MinMaxAgent.cs" />
+    <Compile Include="Model\Agents\NeuralNet.cs" />
     <Compile Include="Model\OthelloBoard.cs" />
     <Compile Include="Model\OthelloGame.cs" />
     <Compile Include="Model\Tests.cs" />
-    <Compile Include="Model\ThorGame.cs" />
+    <Compile Include="Model\IO\ThorGame.cs" />
     <Compile Include="View\ColorDictionary.cs" />
     <Compile Include="View\OthelloForm.cs">
       <SubType>Form</SubType>
@@ -212,6 +215,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

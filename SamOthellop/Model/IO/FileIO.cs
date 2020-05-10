@@ -2,8 +2,6 @@
 using System.IO;
 using System.Threading;
 using System.Windows.Forms;
-using IntelHexFormatReader;
-using IntelHexFormatReader.Model;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -182,7 +180,7 @@ namespace SamOthellop.Model
             object gameTransferLock = new object();
             List<Task> gameTransferTask = new List<Task>();
 
-            Parallel.ForEach(files, (file) => //For each file, read games 
+            Parallel.ForEach(files, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (file) => //For each file, read games 
             {
                 object fileGameLock = new object();
                 List<OthelloGame> fileGameRepo = new List<OthelloGame>();
@@ -190,7 +188,9 @@ namespace SamOthellop.Model
                 var stopwatch = System.Diagnostics.Stopwatch.StartNew();
                 List<ThorGame> games = FileIO.ReadThorFile(file);
 
-                Parallel.ForEach(games, (tgame) => //for each game, transfer to OthelloGame
+                //Parallel.ForEach(games, (tgame) => //for each game, transfer to OthelloGame
+                //{
+                foreach (ThorGame tgame in games)
                 {
                     OthelloGame oGame;
 
@@ -206,9 +206,9 @@ namespace SamOthellop.Model
                     {
                         System.Diagnostics.Debug.WriteLine("failed a THOR->OthelloGame Transformation");
                     }
+                }
 
-
-                });
+                //});
 
 
                 lock (gameTransferLock)

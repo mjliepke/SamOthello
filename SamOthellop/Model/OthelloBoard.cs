@@ -13,7 +13,7 @@ namespace SamOthellop.Model
         black = 0xef, //black = !white
         empty = 0x00,
     }
-    class BoardBase
+    public  class BoardBase
     {
         public const byte BOARD_SIZE = 8;
         public byte MaxMoves { get; protected set; }
