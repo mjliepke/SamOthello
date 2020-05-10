@@ -37,14 +37,14 @@ namespace SamOthellop.Model.Genetic
                 BoardStates player =  (index % 2 == 0) ? BoardStates.black : BoardStates.white;
 
                 OthelloGame othelloGame = new OthelloGame();
-                MinMaxAgent minMaxAgent = new MinMaxAgent(genes, 1);
+                IEvaluationAgent heurAgent = new HeuristicAgent(genes);
   
 
                 while (!othelloGame.GameComplete)
                 {
                     if (othelloGame.WhosTurn == player)
                     {
-                        othelloGame.MakeMove(minMaxAgent.MakeMove(othelloGame, player));
+                        othelloGame.MakeMove(heurAgent.MakeMove(othelloGame, player));
                     }
                     else
                     {

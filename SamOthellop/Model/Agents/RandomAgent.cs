@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SamOthellop.Model.Agents
 {
-    class RandomAgent : IOthelloAgent
+    public class RandomAgent : IOthelloAgent
     {
         public override byte[] MakeMove(OthelloGame game, BoardStates player)
         {

@@ -54,30 +54,6 @@ namespace SamOthellop.Model
             return game;
         }
 
-        public void MakeRandomMove(BoardStates player)
-        {
-            List<byte[]> possibleMoves = GetPossiblePlayList(player);
-           
-            if (possibleMoves.Count == 0)
-            {
-                return;
-            }
-            Random rndGenerator = new Random();
-            int rnd = (int)Math.Floor(rndGenerator.NextDouble() * possibleMoves.Count);
-
-            MakeMove(player, possibleMoves[rnd]);
-        }
-
-        public void MakeRandomMove()
-        {
-            int moves = GetMovesMade();
-            BoardStates player1 = WhosTurn;
-            MakeRandomMove(WhosTurn);
-            if (moves == GetMovesMade())//will happen when play does not have move & faults to next
-            {
-                MakeRandomMove(WhosTurn);
-            }
-        }
 
         //*************************Static Methods**************************
 

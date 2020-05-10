@@ -9,7 +9,7 @@ namespace SamOthellop.Model.Agents
     /// <summary>
     /// Evaluates board based on user-defined features
     /// </summary>
-    class HeuristicAgent : IOthelloAgent
+    class HeuristicAgent : IEvaluationAgent
     {
         /// <summary>
         /// Formula takes the following form : value = (diffSlope * diff) + (offsetSlope * time)  + diffOffset
@@ -75,14 +75,14 @@ namespace SamOthellop.Model.Agents
                 avalibleMoveDiffSlope = 0;
                 nonTurnableCoinDiffSlope = 10;
                 controlledCornerDiffSlope = 100;
-                
+
                 coinDiffOffset = 30;
                 cornerDiffOffset = 30;
                 nearCornerDiffOffset = 30;
                 avalibleMoveDiffOffset = 30;
                 nonTurnableCoinDiffOffset = 30;
                 controlledCornerDiffOffset = 30;
-                
+
                 coinTimeSlope = 0;
                 cornerTimeSlope = 0;
                 nearCornerTimeSlope = 0;
@@ -134,7 +134,7 @@ namespace SamOthellop.Model.Agents
             {
                 OthelloGame testGame = game.DeepCopy();
                 testGame.MakeMove(move);
-                double thisScore = HeuristicEval(player, testGame);
+                double thisScore = EvaluateBoard(testGame, player);
                 if (thisScore > bestScore)
                 {
                     bestScore = thisScore;
@@ -177,7 +177,7 @@ namespace SamOthellop.Model.Agents
         };
         }
 
-        private double HeuristicEval(BoardStates player, OthelloGame game)
+        public override double EvaluateBoard(OthelloGame game, BoardStates player)
         {
             ///Based of features of the board that humans have identified.  
             ///Hints of evaluation from any source I could find
@@ -193,13 +193,21 @@ namespace SamOthellop.Model.Agents
             {
                 return CompleteEval(player, game);
             }
+            //plane funct
+            //value += coinDiffSlope * (game.GetPieceCount(player) - game.GetPieceCount(~player)) + (empty * coinTimeSlope) + coinDiffOffset;
+            //value += cornerDiffSlope * (game.GetCornerCount(player) - game.GetCornerCount(~player)) + (empty * cornerTimeSlope) + cornerDiffOffset;
+            //value += nearCornerDiffSlope * (game.GetAdjCornerCount(player) - game.GetAdjCornerCount(~player)) + (empty * nearCornerTimeSlope) + nearCornerDiffOffset;
+            //value += avalibleMoveDiffSlope * (game.GetPossiblePlayList(player).Count() - game.GetPossiblePlayList(~player).Count()) + (empty * avalibleMoveTimeSlope) + avalibleMoveDiffOffset;
+            //value += nonTurnableCoinDiffSlope * (game.GetSafePeiceCountEstimation(player) - game.GetSafePeiceCountEstimation(~player)) + (empty * nonTurnableTimeSlope) + nonTurnableCoinDiffOffset;
+            //value += controlledCornerDiffSlope * (game.GetControlledCorners(player) - game.GetControlledCorners(~player)) + (empty * controlledCornerTimeSlope) + controlledCornerDiffOffset;
 
-            value += coinDiffSlope * (game.GetPieceCount(player) - game.GetPieceCount(~player)) + (empty * coinTimeSlope) + coinDiffOffset;
-            value += cornerDiffSlope * (game.GetCornerCount(player) - game.GetCornerCount(~player)) + (empty * cornerTimeSlope) + cornerDiffOffset;
-            value += nearCornerDiffSlope * (game.GetAdjCornerCount(player) - game.GetAdjCornerCount(~player)) + (empty * nearCornerTimeSlope) + nearCornerDiffOffset;
-            value += avalibleMoveDiffSlope * (game.GetPossiblePlayList(player).Count() - game.GetPossiblePlayList(~player).Count()) + (empty * avalibleMoveTimeSlope) + avalibleMoveDiffOffset;
-            value += nonTurnableCoinDiffSlope * (game.GetSafePeiceCountEstimation(player) - game.GetSafePeiceCountEstimation(~player)) + (empty * nonTurnableTimeSlope) + nonTurnableCoinDiffOffset;
-            value += controlledCornerDiffSlope * (game.GetControlledCorners(player) - game.GetControlledCorners(~player)) + (empty * controlledCornerTimeSlope) + controlledCornerDiffOffset;
+            //power funct
+            value += coinDiffSlope * Math.Pow(game.GetPieceCount(player) - game.GetPieceCount(~player) + empty - coinDiffOffset, coinTimeSlope);
+            value += cornerDiffSlope * Math.Pow(game.GetCornerCount(player) - game.GetCornerCount(~player) + empty - cornerDiffOffset, cornerTimeSlope);
+            value += nearCornerDiffSlope * Math.Pow(game.GetAdjCornerCount(player) - game.GetAdjCornerCount(~player) + empty - nearCornerDiffOffset, nearCornerTimeSlope);
+            value += avalibleMoveDiffSlope * Math.Pow(game.GetPossiblePlayList(player).Count() - game.GetPossiblePlayList(~player).Count() + empty - avalibleMoveDiffOffset, avalibleMoveTimeSlope);
+            value += nonTurnableCoinDiffSlope * Math.Pow(game.GetSafePeiceCountEstimation(player) - game.GetSafePeiceCountEstimation(~player) + empty - nonTurnableCoinDiffOffset, nonTurnableTimeSlope);
+            value += controlledCornerDiffSlope * Math.Pow(game.GetControlledCorners(player) - game.GetControlledCorners(~player) + empty - controlledCornerDiffOffset, controlledCornerTimeSlope);
             return value;
         }
 
@@ -259,5 +267,7 @@ namespace SamOthellop.Model.Agents
             }
             return new byte[] { byte.MaxValue, byte.MaxValue };
         }
+
+
     }
 }

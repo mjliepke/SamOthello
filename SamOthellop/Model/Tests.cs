@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using SamOthellop.Model.Agents;
 
 namespace SamOthellop.Model
 {
@@ -24,20 +25,21 @@ namespace SamOthellop.Model
             //{
             for (int index = 0; index < testCount; index++)
             {//non-parallel for loop to debug
-                BoardStates player = BoardStates.black;// (index % 2 == 0) ? BoardStates.black : BoardStates.white;
+                BoardStates player =  (index % 2 == 0) ? BoardStates.black : BoardStates.white;
 
                 OthelloGame testGame = new OthelloGame();
-                MinMaxAgent othelloAgent = new MinMaxAgent();
+                MinMaxAgent othelloAgent = new MinMaxAgent(2);
+                RandomAgent randAgent = new RandomAgent();
                 while (!testGame.GameComplete)
                 {
                     if (testGame.WhosTurn == player)
                     {
 
-                        testGame.MakeMove(othelloAgent.MakeMove(minimaxDepth, testGame, player));
+                        testGame.MakeMove(othelloAgent.MakeMove( testGame, player));
                     }
                     else
                     {
-                        testGame.MakeRandomMove(~player);
+                        testGame.MakeMove(randAgent.MakeMove(testGame,~player));
                     }
 
                 }

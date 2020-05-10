@@ -15,5 +15,7 @@ namespace SamOthellop.Model
         /// <param name="player"></param>
         /// <returns>Location of choice move</returns>
         public  abstract byte[] MakeMove(OthelloGame game, BoardStates player);
+
+
     }
 }

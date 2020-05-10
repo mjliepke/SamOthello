@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace SamOthellop
 {
-    class PiecePanel : Panel
+    public class PiecePanel : Panel
     {
         private Color FillColor = Color.Black;
         public int[] location{

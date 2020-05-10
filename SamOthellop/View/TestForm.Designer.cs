@@ -1,6 +1,6 @@
 ﻿namespace SamOthellop
 {
-    partial class OthelloForm
+    partial class TestForm
     {
         /// <summary>
         /// Required designer variable.
