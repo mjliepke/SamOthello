@@ -1,4 +1,5 @@
 ﻿using SamOthellop.Model;
+using SamOthellop.Model.Agents;
 using SamOthellop.Model.Genetic;
 using SamOthellop.View;
 using System;
@@ -16,16 +17,16 @@ using System.Windows.Forms;
 
 namespace SamOthellop
 {
-    public partial class OthelloForm : Form
+    public partial class TestForm : Form
     {
         private OthelloGame _myGame;
         private PiecePanel[,] _boardPanels;
         private System.Timers.Timer _twoSecondTimer;
         private BoardNeuralNet _net;
-        private MinMaxAgent _minMaxAgent;
+        private IOthelloAgent _myAgent;
         private int _currentViewedMove;
 
-        public OthelloForm()
+        public TestForm()
         {
             InitializeComponent();
             _twoSecondTimer = new System.Timers.Timer(2000);
@@ -42,7 +43,7 @@ namespace SamOthellop
         private void SetupBoard()
         {
             _myGame = new OthelloGame();
-            _minMaxAgent = new MinMaxAgent();
+            _myAgent = new MinMaxAgent();
             _boardPanels = new PiecePanel[OthelloGame.BOARD_SIZE, OthelloGame.BOARD_SIZE];
             _currentViewedMove = 0;
             int tileSize = ((Size.Width > Size.Height) ? Size.Height - 45 : Size.Width - 45) / OthelloGame.BOARD_SIZE;
@@ -180,7 +181,8 @@ namespace SamOthellop
 
         private void RandomMoveButton_Click(object sender, EventArgs e)
         {
-            _myGame.MakeRandomMove();
+            IOthelloAgent myAgent = new RandomAgent();
+            _myGame.MakeMove(myAgent.MakeMove(_myGame, _myGame.WhosTurn));
             RefreshControls();
         }
 
@@ -189,9 +191,10 @@ namespace SamOthellop
             EnableControlButtons(false);
             new Thread(() =>
             {
+                IOthelloAgent myAgent = new RandomAgent();
                 while (!_myGame.GameComplete)
                 {
-                    _myGame.MakeRandomMove();
+                    _myGame.MakeMove(myAgent.MakeMove(_myGame, _myGame.WhosTurn));
                 }
                 Invoke(new Action(() =>
                 {
@@ -226,11 +229,12 @@ namespace SamOthellop
 
             new Thread(() =>
             {
+                IOthelloAgent myAgent = new RandomAgent();
                 for (int i = 0; i < gameCount; i++)
                 {
                     while (!_myGame.GameComplete)
                     {
-                        _myGame.MakeRandomMove();
+                        _myGame.MakeMove(myAgent.MakeMove(_myGame, _myGame.WhosTurn));
                     }
                     Invoke(new Action(() =>
                     {
@@ -281,7 +285,8 @@ namespace SamOthellop
             new Thread(() =>
             {
                 int unused = 0;
-                _myGame.MakeMove(_myGame.WhosTurn, _minMaxAgent.MakeMove(Convert.ToInt32(MoveDepth.Text), _myGame, _myGame.WhosTurn));
+                _myAgent = new MinMaxAgent(new HeuristicAgent(),Convert.ToInt32(MoveDepth.Text));
+                _myGame.MakeMove(_myGame.WhosTurn, _myAgent.MakeMove( _myGame, _myGame.WhosTurn));
 
                 Invoke(new Action(() =>
                 {
@@ -342,7 +347,7 @@ namespace SamOthellop
             EnableControlButtons(false);
             new Thread(() =>
             {
-                Evolution.RunRecursiveGeneticAlgorithm(10);
+                Evolution.RunRecursiveGeneticAlgorithm();
                 Invoke(new Action(() =>
                 {
                     EnableControlButtons();

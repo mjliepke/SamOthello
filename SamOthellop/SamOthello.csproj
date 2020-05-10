@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\SciSharp.TensorFlow.Redist-Windows-GPU.1.15.1\build\netstandard2.0\SciSharp.TensorFlow.Redist-Windows-GPU.props" Condition="Exists('..\packages\SciSharp.TensorFlow.Redist-Windows-GPU.1.15.1\build\netstandard2.0\SciSharp.TensorFlow.Redist-Windows-GPU.props')" />
   <Import Project="..\packages\SciSharp.TensorFlow.Redist.2.1.0\build\netstandard2.0\SciSharp.TensorFlow.Redist.props" Condition="Exists('..\packages\SciSharp.TensorFlow.Redist.2.1.0\build\netstandard2.0\SciSharp.TensorFlow.Redist.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -14,6 +13,9 @@
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -26,14 +28,11 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -41,9 +40,10 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -57,9 +57,33 @@
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>SamOthellop.Program</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>gameicon_v7F_icon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Antlr3.Runtime, Version=3.5.0.2, Culture=neutral, PublicKeyToken=eb42632606e9261f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Antlr3.Runtime.3.5.1\lib\net40-client\Antlr3.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="GeneticSharp.Domain, Version=2.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GeneticSharp.2.6.0\lib\net462\GeneticSharp.Domain.dll</HintPath>
+    </Reference>
+    <Reference Include="GeneticSharp.Extensions, Version=2.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GeneticSharp.Extensions.2.6.0\lib\net462\GeneticSharp.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="GeneticSharp.Infrastructure.Framework, Version=2.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GeneticSharp.2.6.0\lib\net462\GeneticSharp.Infrastructure.Framework.dll</HintPath>
+    </Reference>
     <Reference Include="Google.Protobuf, Version=3.11.4.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
       <HintPath>..\packages\Google.Protobuf.3.11.4\lib\net45\Google.Protobuf.dll</HintPath>
+    </Reference>
+    <Reference Include="NCalc, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NCalc.NetCore.1.0.1\lib\netstandard2.0\NCalc.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NumSharp.Lite, Version=0.1.7.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\NumSharp.Lite.0.1.7\lib\netstandard2.0\NumSharp.Lite.dll</HintPath>
@@ -72,6 +96,9 @@
       <HintPath>..\packages\System.Buffers.4.4.0\lib\netstandard2.0\System.Buffers.dll</HintPath>
     </Reference>
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing.Common, Version=4.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Drawing.Common.4.5.0\lib\net461\System.Drawing.Common.dll</HintPath>
+    </Reference>
     <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Memory.4.5.3\lib\netstandard2.0\System.Memory.dll</HintPath>
     </Reference>
@@ -97,22 +124,37 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Model\NeuralNet.cs" />
+    <Compile Include="Model\Agents\AgentDictionary.cs" />
+    <Compile Include="Model\Agents\GreedyAgent.cs" />
+    <Compile Include="Model\Agents\Heuristic\HeuristicAgent.cs" />
+    <Compile Include="Model\Agents\IEvaluationAgent.cs" />
+    <Compile Include="Model\Agents\RandomAgent.cs" />
+    <Compile Include="Model\IO\FileIO.cs" />
+    <Compile Include="Model\Agents\Genetic\ChromosomeMutation.cs" />
+    <Compile Include="Model\Agents\Genetic\EvaluationChromosome.cs" />
+    <Compile Include="Model\Agents\Genetic\EvaluationFitness.cs" />
+    <Compile Include="Model\Agents\Genetic\Evolution.cs" />
+    <Compile Include="Model\Agents\IOthelloAgent.cs" />
+    <Compile Include="Model\Agents\MinMaxAgent.cs" />
+    <Compile Include="Model\Agents\NeuralNet\NeuralNet.cs" />
     <Compile Include="Model\OthelloBoard.cs" />
-    <Compile Include="View\OthelloForm.cs">
+    <Compile Include="Model\OthelloGame.cs" />
+    <Compile Include="Model\Tests.cs" />
+    <Compile Include="Model\IO\ThorGame.cs" />
+    <Compile Include="View\ColorDictionary.cs" />
+    <Compile Include="View\TestForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="View\OthelloForm.Designer.cs">
-      <DependentUpon>OthelloForm.cs</DependentUpon>
+    <Compile Include="View\TestForm.Designer.cs">
+      <DependentUpon>TestForm.cs</DependentUpon>
     </Compile>
     <Compile Include="View\PiecePanel.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <None Include="Model\SamCode.cs" />
-    <EmbeddedResource Include="View\OthelloForm.resx">
-      <DependentUpon>OthelloForm.cs</DependentUpon>
+    <EmbeddedResource Include="View\TestForm.resx">
+      <DependentUpon>TestForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -123,6 +165,21 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="Database\WTH_2001.wtb" />
+    <None Include="Database\WTH_2002.wtb" />
+    <None Include="Database\WTH_2003.wtb" />
+    <None Include="Database\WTH_2004.wtb" />
+    <None Include="Database\WTH_2005.wtb" />
+    <None Include="Database\WTH_2006.wtb" />
+    <None Include="Database\WTH_2007.wtb" />
+    <None Include="Database\WTH_2008.wtb" />
+    <None Include="Database\WTH_2009.wtb" />
+    <None Include="Database\WTH_2010.wtb" />
+    <None Include="Database\WTH_2011.wtb" />
+    <None Include="Database\WTH_2012.wtb" />
+    <None Include="Database\WTH_2013.wtb" />
+    <None Include="Database\WTH_2014.wtb" />
+    <None Include="Database\WTH_2015.wtb" />
     <None Include="packages.config" />
     <None Include="Properties\DataSources\OthelloBoard.BoardStates.datasource" />
     <None Include="Properties\DataSources\OthelloBoard.datasource" />
@@ -143,6 +200,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="gameicon_v7F_icon.ico" />
     <Content Include="View\Instructions.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -159,12 +217,12 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\SciSharp.TensorFlow.Redist.2.1.0\build\netstandard2.0\SciSharp.TensorFlow.Redist.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SciSharp.TensorFlow.Redist.2.1.0\build\netstandard2.0\SciSharp.TensorFlow.Redist.props'))" />
-    <Error Condition="!Exists('..\packages\SciSharp.TensorFlow.Redist-Windows-GPU.1.15.1\build\netstandard2.0\SciSharp.TensorFlow.Redist-Windows-GPU.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SciSharp.TensorFlow.Redist-Windows-GPU.1.15.1\build\netstandard2.0\SciSharp.TensorFlow.Redist-Windows-GPU.props'))" />
   </Target>
 </Project>
