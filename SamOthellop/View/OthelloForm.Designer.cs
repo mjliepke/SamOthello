@@ -30,6 +30,8 @@
         {
             this.InstructionBrowser = new System.Windows.Forms.WebBrowser();
             this.ControlGroupBox = new System.Windows.Forms.GroupBox();
+            this.GetSafePeiceButton = new System.Windows.Forms.Button();
+            this.MiniMaxTextButton = new System.Windows.Forms.Button();
             this.NextMoveButton = new System.Windows.Forms.Button();
             this.PreviousMoveButton = new System.Windows.Forms.Button();
             this.FileLoadButton = new System.Windows.Forms.Button();
@@ -46,7 +48,7 @@
             this.gameProgressLabel = new System.Windows.Forms.Label();
             this.GameCompletionProgressBar = new System.Windows.Forms.ProgressBar();
             this.GameOverLabel = new System.Windows.Forms.Label();
-            this.MiniMaxTextButton = new System.Windows.Forms.Button();
+            this.GAButton = new System.Windows.Forms.Button();
             this.ControlGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -62,6 +64,8 @@
             // 
             // ControlGroupBox
             // 
+            this.ControlGroupBox.Controls.Add(this.GAButton);
+            this.ControlGroupBox.Controls.Add(this.GetSafePeiceButton);
             this.ControlGroupBox.Controls.Add(this.MiniMaxTextButton);
             this.ControlGroupBox.Controls.Add(this.NextMoveButton);
             this.ControlGroupBox.Controls.Add(this.PreviousMoveButton);
@@ -86,6 +90,26 @@
             this.ControlGroupBox.TabIndex = 1;
             this.ControlGroupBox.TabStop = false;
             this.ControlGroupBox.Text = " ";
+            // 
+            // GetSafePeiceButton
+            // 
+            this.GetSafePeiceButton.Location = new System.Drawing.Point(18, 414);
+            this.GetSafePeiceButton.Name = "GetSafePeiceButton";
+            this.GetSafePeiceButton.Size = new System.Drawing.Size(103, 23);
+            this.GetSafePeiceButton.TabIndex = 20;
+            this.GetSafePeiceButton.Text = "Print Safe Peices";
+            this.GetSafePeiceButton.UseVisualStyleBackColor = true;
+            this.GetSafePeiceButton.Click += new System.EventHandler(this.GetSafePeiceButton_Click);
+            // 
+            // MiniMaxTextButton
+            // 
+            this.MiniMaxTextButton.Location = new System.Drawing.Point(170, 391);
+            this.MiniMaxTextButton.Name = "MiniMaxTextButton";
+            this.MiniMaxTextButton.Size = new System.Drawing.Size(103, 23);
+            this.MiniMaxTextButton.TabIndex = 19;
+            this.MiniMaxTextButton.Text = "Test MiniMax";
+            this.MiniMaxTextButton.UseVisualStyleBackColor = true;
+            this.MiniMaxTextButton.Click += new System.EventHandler(this.MiniMaxTestButton_Click);
             // 
             // NextMoveButton
             // 
@@ -250,15 +274,15 @@
             this.GameOverLabel.Text = "GAME OVER";
             this.GameOverLabel.Visible = false;
             // 
-            // MiniMaxTextButton
+            // GAButton
             // 
-            this.MiniMaxTextButton.Location = new System.Drawing.Point(170, 391);
-            this.MiniMaxTextButton.Name = "MiniMaxTextButton";
-            this.MiniMaxTextButton.Size = new System.Drawing.Size(103, 23);
-            this.MiniMaxTextButton.TabIndex = 19;
-            this.MiniMaxTextButton.Text = "Test MiniMax";
-            this.MiniMaxTextButton.UseVisualStyleBackColor = true;
-            this.MiniMaxTextButton.Click += new System.EventHandler(this.MiniMaxTestButton_Click);
+            this.GAButton.Location = new System.Drawing.Point(170, 420);
+            this.GAButton.Name = "GAButton";
+            this.GAButton.Size = new System.Drawing.Size(103, 23);
+            this.GAButton.TabIndex = 21;
+            this.GAButton.Text = "Test GA";
+            this.GAButton.UseVisualStyleBackColor = true;
+            this.GAButton.Click += new System.EventHandler(this.GAButton_Click);
             // 
             // OthelloForm
             // 
@@ -299,6 +323,8 @@
         private System.Windows.Forms.Button NextMoveButton;
         private System.Windows.Forms.Button PreviousMoveButton;
         private System.Windows.Forms.Button MiniMaxTextButton;
+        private System.Windows.Forms.Button GetSafePeiceButton;
+        private System.Windows.Forms.Button GAButton;
     }
 }
 
