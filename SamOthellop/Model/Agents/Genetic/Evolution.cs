@@ -26,7 +26,7 @@ namespace SamOthellop.Model.Genetic
         /// </summary>
         /// <param name="recursionDepth"></param>
 
-        private const string FOLDER_PATH = @"E:\Source\SamOthellop\SamOthellop\Model\Agents\Genetic\5-11b";//path to save 
+        private const string FOLDER_PATH = @"E:\Source\SamOthellop\SamOthellop\Model\Agents\Genetic\5-12b\";//path to save 
         private const int GENE_COUNT = 21;
         private const int MIN_GENE_VALUE = -100;
         private const int MAX_GENE_VALUE = 100;
@@ -35,7 +35,7 @@ namespace SamOthellop.Model.Genetic
         {
             //double[] priorGenes = LoadChromosome(@"E:\Source\SamOthellop\SamOthellop\Model\Agents\Genetic\bestchromosome5-10.dat");
 
-            FloatingPointChromosome chromosome = new FloatingPointChromosome(
+            FloatingPointChromosome firstChm = new FloatingPointChromosome(
                                                                             new double[] { -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100 },
                                                                             new double[] { 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100 },
                                                                             new int[] { 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64 },
@@ -46,10 +46,11 @@ namespace SamOthellop.Model.Genetic
             stopwatch.Start();
             for (int i = 0; i < recursionDepth; i++)
             {
+                FloatingPointChromosome bestChm = firstChm;
                 if (i == 0)
                 {
                     List<IOthelloAgent> opposingAgents = new List<IOthelloAgent>(){new RandomAgent(), new GreedyAgent()} ;
-                    EvolveGeneticAlgorithm(chromosome, opposingAgents, "test" + i.ToString() + ".dat");
+                     bestChm = EvolveGeneticAlgorithm(firstChm, opposingAgents, "test" + i.ToString() + ".dat");
                 }
                 else
                 {
@@ -57,7 +58,12 @@ namespace SamOthellop.Model.Genetic
                     List<IOthelloAgent> opposingAgents = previousAgentFiles.Select((file) => new HeuristicAgent(LoadChromosome(file))).Cast<IOthelloAgent>().ToList();
                     opposingAgents.Add(new GreedyAgent());
                     opposingAgents.Add(new RandomAgent());
-                    EvolveGeneticAlgorithm(chromosome, opposingAgents, "test" + i.ToString() + ".dat");
+                    bestChm = EvolveGeneticAlgorithm(bestChm, opposingAgents, "test" + i.ToString() + ".dat");
+                    bestChm = new FloatingPointChromosome(new double[] { -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100 },
+                                                                            new double[] { 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100 },
+                                                                            new int[] { 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64 },
+                                                                            new int[] { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
+                                                                            NormalizeGenes(bestChm.ToFloatingPoints()));
                 }
             }
             stopwatch.Stop();
@@ -67,7 +73,7 @@ namespace SamOthellop.Model.Genetic
 
         public static FloatingPointChromosome EvolveGeneticAlgorithm(FloatingPointChromosome chromosome, List<IOthelloAgent> agents, string chromosomeLabel = "")
         {
-            IPopulation population = new TplPopulation(50,125, chromosome);
+            IPopulation population = new TplPopulation(100,160, chromosome);
             IFitness fitness = new EvaluationFitness(agents);
             ISelection selection = new RouletteWheelSelection(); //Guess
             ICrossover crossover = new UniformCrossover(); //Guess
@@ -75,15 +81,15 @@ namespace SamOthellop.Model.Genetic
 
 
             ITermination stagnation = new FitnessStagnationTermination(200);
-            ITermination timeLimit = new TimeEvolvingTermination(new TimeSpan(4, 0, 0));
+            ITermination timeLimit = new TimeEvolvingTermination(new TimeSpan(3, 0, 0));
             ITermination threshold;
             if (agents.Count < 3)
             {
-                 threshold = new FitnessThresholdTermination(.96);
+                 threshold = new FitnessThresholdTermination(.97);
             }
             else
             {
-                 threshold = new FitnessThresholdTermination(.9);
+                 threshold = new FitnessThresholdTermination(.93);
             }
             
             OrTermination eitherTermination = new OrTermination(new ITermination[] { stagnation, threshold, timeLimit });
@@ -123,7 +129,7 @@ namespace SamOthellop.Model.Genetic
         public static double[] NormalizeGenes(double[] genes)
         {
             double currentMaxGene = genes.ToList().Max();
-            double scaleFactor = .5 * MAX_GENE_VALUE / currentMaxGene;
+            double scaleFactor = .3 * MAX_GENE_VALUE / currentMaxGene;
             return genes.ToList().Select(gene => gene * scaleFactor).ToArray();
         }
 

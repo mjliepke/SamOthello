@@ -16,7 +16,7 @@ namespace SamOthellop.Model.Genetic
 
         public EvaluationFitness(IOthelloAgent agent, int testCount = 100) : base()
         {
-            opposingAgents.Add(agent);
+            opposingAgents = new List<IOthelloAgent>() { agent };
             TEST_COUNT = testCount;
         }
 

@@ -285,8 +285,8 @@ namespace SamOthellop
             new Thread(() =>
             {
                 int unused = 0;
-                _myAgent = new MinMaxAgent(new HeuristicAgent(),Convert.ToInt32(MoveDepth.Text));
-                _myGame.MakeMove(_myGame.WhosTurn, _myAgent.MakeMove( _myGame, _myGame.WhosTurn));
+                _myAgent = new MinMaxAgent(new HeuristicAgent(), Convert.ToInt32(MoveDepth.Text));
+                _myGame.MakeMove(_myGame.WhosTurn, _myAgent.MakeMove(_myGame, _myGame.WhosTurn));
 
                 Invoke(new Action(() =>
                 {
@@ -354,6 +354,23 @@ namespace SamOthellop
                 }));
             }).Start();
 
+        }
+
+        private void EvaluateFitnessButton_Click(object sender, EventArgs e)
+        {
+            string[] files = Directory.GetFiles(@"E:\Source\SamOthellop\SamOthellop\Model\Agents\Genetic", "*.dat");
+
+            foreach (string file in files)
+            {
+                Evolution.PrintChromosomeFitness(file, new RandomAgent());
+                Evolution.PrintChromosomeFitness(file, new GreedyAgent());
+                Evolution.PrintChromosomeFitness(file, new MinMaxAgent(new GreedyAgent(), 2));
+            }
+        }
+
+        private void NormalizedGeneTestButton_Click(object sender, EventArgs e)
+        {
+            Tests.TestNormalizeGenes();
         }
     }
 }

@@ -30,6 +30,7 @@
         {
             this.InstructionBrowser = new System.Windows.Forms.WebBrowser();
             this.ControlGroupBox = new System.Windows.Forms.GroupBox();
+            this.EvaluateFitnessButton = new System.Windows.Forms.Button();
             this.GAButton = new System.Windows.Forms.Button();
             this.GetSafePeiceButton = new System.Windows.Forms.Button();
             this.MiniMaxTextButton = new System.Windows.Forms.Button();
@@ -49,7 +50,7 @@
             this.gameProgressLabel = new System.Windows.Forms.Label();
             this.GameCompletionProgressBar = new System.Windows.Forms.ProgressBar();
             this.GameOverLabel = new System.Windows.Forms.Label();
-            this.EvaluateFitnessButton = new System.Windows.Forms.Button();
+            this.NormalizedGeneTestButton = new System.Windows.Forms.Button();
             this.ControlGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -65,6 +66,7 @@
             // 
             // ControlGroupBox
             // 
+            this.ControlGroupBox.Controls.Add(this.NormalizedGeneTestButton);
             this.ControlGroupBox.Controls.Add(this.EvaluateFitnessButton);
             this.ControlGroupBox.Controls.Add(this.GAButton);
             this.ControlGroupBox.Controls.Add(this.GetSafePeiceButton);
@@ -92,6 +94,16 @@
             this.ControlGroupBox.TabIndex = 1;
             this.ControlGroupBox.TabStop = false;
             this.ControlGroupBox.Text = " ";
+            // 
+            // EvaluateFitnessButton
+            // 
+            this.EvaluateFitnessButton.Location = new System.Drawing.Point(18, 443);
+            this.EvaluateFitnessButton.Name = "EvaluateFitnessButton";
+            this.EvaluateFitnessButton.Size = new System.Drawing.Size(103, 23);
+            this.EvaluateFitnessButton.TabIndex = 22;
+            this.EvaluateFitnessButton.Text = "EvaluateFitness";
+            this.EvaluateFitnessButton.UseVisualStyleBackColor = true;
+            this.EvaluateFitnessButton.Click += new System.EventHandler(this.EvaluateFitnessButton_Click);
             // 
             // GAButton
             // 
@@ -286,15 +298,15 @@
             this.GameOverLabel.Text = "GAME OVER";
             this.GameOverLabel.Visible = false;
             // 
-            // EvaluateFitnessButton
+            // NormalizedGeneTestButton
             // 
-            this.EvaluateFitnessButton.Location = new System.Drawing.Point(18, 443);
-            this.EvaluateFitnessButton.Name = "EvaluateFitnessButton";
-            this.EvaluateFitnessButton.Size = new System.Drawing.Size(103, 23);
-            this.EvaluateFitnessButton.TabIndex = 22;
-            this.EvaluateFitnessButton.Text = "EvaluateFitness";
-            this.EvaluateFitnessButton.UseVisualStyleBackColor = true;
-            this.EvaluateFitnessButton.Click += new System.EventHandler(this.EvaluateFitnessButton_Click);
+            this.NormalizedGeneTestButton.Location = new System.Drawing.Point(170, 443);
+            this.NormalizedGeneTestButton.Name = "NormalizedGeneTestButton";
+            this.NormalizedGeneTestButton.Size = new System.Drawing.Size(103, 23);
+            this.NormalizedGeneTestButton.TabIndex = 23;
+            this.NormalizedGeneTestButton.Text = "Test Normalized Gene";
+            this.NormalizedGeneTestButton.UseVisualStyleBackColor = true;
+            this.NormalizedGeneTestButton.Click += new System.EventHandler(this.NormalizedGeneTestButton_Click);
             // 
             // TestForm
             // 
@@ -338,6 +350,7 @@
         private System.Windows.Forms.Button GetSafePeiceButton;
         private System.Windows.Forms.Button GAButton;
         private System.Windows.Forms.Button EvaluateFitnessButton;
+        private System.Windows.Forms.Button NormalizedGeneTestButton;
     }
 }
 

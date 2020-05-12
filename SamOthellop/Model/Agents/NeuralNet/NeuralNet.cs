@@ -1,13 +1,12 @@
-﻿using System;
+﻿using NumSharp;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Tensorflow.Binding;
-using Tensorflow;
-//using PlotNET; Dependencies don't allow this to run with Tensorflow due to Numsharp version dependencies
-using NumSharp;
 using System.Windows.Forms;
+using Tensorflow;
+using static Tensorflow.Binding;
 
 // For GPU version (CUDA and cuDNN are required)
 //PM> Install-Package SciSharp.TensorFlow.Redist-Windows-GPU
@@ -33,7 +32,7 @@ namespace SamOthellop.Model
 
         public void StartTest()
         {
-            int training_epochs = 1000;
+            int training_epochs = 5000;
 
             // Parameters
             float learning_rate = 0.01f;
