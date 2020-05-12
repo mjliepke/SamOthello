@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace SamOthellop.Model
 {
     [Flags]
-    public enum BoardStates : Byte
+     public enum BoardStates : Byte
     {
         white = 0x10,
         black = 0xef, //black = !white
@@ -36,7 +36,7 @@ namespace SamOthellop.Model
             SetupBoard();
         }
 
-        private bool GameOver()
+        private bool TestGameOver()
         {
             bool moveExists = false;
 
@@ -71,10 +71,9 @@ namespace SamOthellop.Model
                 {
                     Board[takenPeices[i][0], takenPeices[i][1]] = player;
                 }
-                BoardStates opponent = ~player;
-                if (PlayerHasMove(opponent))
+                if (PlayerHasMove(~player))
                 {
-                    WhosTurn = opponent;//only switch whos turn it is if other player has moves avalible
+                    WhosTurn = ~player;//only switch whos turn it is if other player has moves avalible
                 }
 
                 BoardHistory.Add(GetBoardCopy(Board));
@@ -85,7 +84,7 @@ namespace SamOthellop.Model
             {
                 int debugLocation = 0;//to stop debugger on invalid move
             }
-            GameOver();
+            TestGameOver();
             return moveMade;
         }
 

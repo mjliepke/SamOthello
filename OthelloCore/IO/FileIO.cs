@@ -1,21 +1,20 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
-using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace SamOthellop.Model
 {
-    static class FileIO
+   public static class FileIO
     {
         const int FILE_HEADER_LENGTH = 16; //bytes
         const int GAME_HEADER_LENGTH = 8;
         const int NUMBER_OF_PLAYS = 60;
         const int GAME_BLOCK_LENGTH = GAME_HEADER_LENGTH + NUMBER_OF_PLAYS;
 
-        public static List<ThorGame> ReadThorFile(string path = @"C:\Users\mjlie\source\repos\SamOthellop\SamOthellop\Database\WTH_2001.wtb")
+        public static List<ThorGame> ReadThorFile(string path = @"E:\Source\SamOthellop\SamOthellop\Database\WTH_2004.wtb")
         {
             /*
              * Thor file capabilities from ledpup's Othello work
@@ -56,11 +55,6 @@ namespace SamOthellop.Model
                     gameDatabase.Add(game);
 
                 }
-
-                //foreach(var game in gameDatabase)
-                //{
-                //    System.Diagnostics.Debug.WriteLine(game.SerialisedPlays);
-                //}
             }
             return gameDatabase;
         }
@@ -73,7 +67,7 @@ namespace SamOthellop.Model
         public static List<OthelloGame> ReadAllGames(string path)
         {//Task per game in a given File, tackles one file at a time
             List<OthelloGame> gameRepo = new List<OthelloGame>();
-            List<string> files = GetFiles(path);
+            List<string> files = GetThorFiles(path);
 
             object gameTransferLock = new object();
 
@@ -132,7 +126,7 @@ namespace SamOthellop.Model
             List<Thread> fileIOThreadList = new List<Thread>();
 
 
-            List<string> files = GetFiles(path);
+            List<string> files = GetThorFiles(path);
 
             foreach (var file in files)
             {
@@ -175,7 +169,7 @@ namespace SamOthellop.Model
         public static List<OthelloGame> ReadAllGames3(string path)
         {//Parallel ForEach for files & games, all at once, outdated
             List<OthelloGame> gameRepo = new List<OthelloGame>();
-            List<string> files = GetFiles(path);
+            List<string> files = GetThorFiles(path);
 
             object gameTransferLock = new object();
             List<Task> gameTransferTask = new List<Task>();
@@ -230,7 +224,7 @@ namespace SamOthellop.Model
         public static List<OthelloGame> ReadAllGames4(string path)
         {//Parallel ForEach for games in a file, tackles one file at a time, outdated
             List<OthelloGame> gameRepo = new List<OthelloGame>();
-            List<string> files = GetFiles(path);
+            List<string> files = GetThorFiles(path);
 
             object gameTransferLock = new object();
             List<Task> gameTransferTask = new List<Task>();
@@ -280,7 +274,7 @@ namespace SamOthellop.Model
             return gameRepo;
         }
 
-        private static List<string> GetFiles(string path)
+        public static List<string> GetThorFiles(string path)
         {
 
             var files = Directory.GetFiles(path, "*.wtb")

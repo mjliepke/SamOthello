@@ -8,7 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SamOthellop\SamOthello.csproj" />
+    <ProjectReference Include="..\OthelloCore\OthelloCore.csproj" />
+    <ProjectReference Include="..\SamOthellop\TestAgents.csproj" />
   </ItemGroup>
 
 </Project>

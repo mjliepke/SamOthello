@@ -30,6 +30,7 @@
         {
             this.InstructionBrowser = new System.Windows.Forms.WebBrowser();
             this.ControlGroupBox = new System.Windows.Forms.GroupBox();
+            this.GAButton = new System.Windows.Forms.Button();
             this.GetSafePeiceButton = new System.Windows.Forms.Button();
             this.MiniMaxTextButton = new System.Windows.Forms.Button();
             this.NextMoveButton = new System.Windows.Forms.Button();
@@ -48,7 +49,7 @@
             this.gameProgressLabel = new System.Windows.Forms.Label();
             this.GameCompletionProgressBar = new System.Windows.Forms.ProgressBar();
             this.GameOverLabel = new System.Windows.Forms.Label();
-            this.GAButton = new System.Windows.Forms.Button();
+            this.EvaluateFitnessButton = new System.Windows.Forms.Button();
             this.ControlGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -64,6 +65,7 @@
             // 
             // ControlGroupBox
             // 
+            this.ControlGroupBox.Controls.Add(this.EvaluateFitnessButton);
             this.ControlGroupBox.Controls.Add(this.GAButton);
             this.ControlGroupBox.Controls.Add(this.GetSafePeiceButton);
             this.ControlGroupBox.Controls.Add(this.MiniMaxTextButton);
@@ -86,10 +88,20 @@
             this.ControlGroupBox.Dock = System.Windows.Forms.DockStyle.Right;
             this.ControlGroupBox.Location = new System.Drawing.Point(469, 0);
             this.ControlGroupBox.Name = "ControlGroupBox";
-            this.ControlGroupBox.Size = new System.Drawing.Size(307, 449);
+            this.ControlGroupBox.Size = new System.Drawing.Size(307, 517);
             this.ControlGroupBox.TabIndex = 1;
             this.ControlGroupBox.TabStop = false;
             this.ControlGroupBox.Text = " ";
+            // 
+            // GAButton
+            // 
+            this.GAButton.Location = new System.Drawing.Point(170, 414);
+            this.GAButton.Name = "GAButton";
+            this.GAButton.Size = new System.Drawing.Size(103, 23);
+            this.GAButton.TabIndex = 21;
+            this.GAButton.Text = "Test GA";
+            this.GAButton.UseVisualStyleBackColor = true;
+            this.GAButton.Click += new System.EventHandler(this.GAButton_Click);
             // 
             // GetSafePeiceButton
             // 
@@ -103,9 +115,9 @@
             // 
             // MiniMaxTextButton
             // 
-            this.MiniMaxTextButton.Location = new System.Drawing.Point(170, 391);
+            this.MiniMaxTextButton.Location = new System.Drawing.Point(170, 389);
             this.MiniMaxTextButton.Name = "MiniMaxTextButton";
-            this.MiniMaxTextButton.Size = new System.Drawing.Size(103, 23);
+            this.MiniMaxTextButton.Size = new System.Drawing.Size(103, 19);
             this.MiniMaxTextButton.TabIndex = 19;
             this.MiniMaxTextButton.Text = "Test MiniMax";
             this.MiniMaxTextButton.UseVisualStyleBackColor = true;
@@ -135,7 +147,7 @@
             // 
             this.FileLoadButton.Location = new System.Drawing.Point(170, 362);
             this.FileLoadButton.Name = "FileLoadButton";
-            this.FileLoadButton.Size = new System.Drawing.Size(103, 23);
+            this.FileLoadButton.Size = new System.Drawing.Size(103, 21);
             this.FileLoadButton.TabIndex = 16;
             this.FileLoadButton.Text = "LoadGames";
             this.FileLoadButton.UseVisualStyleBackColor = true;
@@ -248,7 +260,7 @@
             // gameProgressLabel
             // 
             this.gameProgressLabel.AutoSize = true;
-            this.gameProgressLabel.Location = new System.Drawing.Point(116, 268);
+            this.gameProgressLabel.Location = new System.Drawing.Point(116, 262);
             this.gameProgressLabel.Name = "gameProgressLabel";
             this.gameProgressLabel.Size = new System.Drawing.Size(79, 13);
             this.gameProgressLabel.TabIndex = 2;
@@ -257,7 +269,7 @@
             // GameCompletionProgressBar
             // 
             this.GameCompletionProgressBar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.GameCompletionProgressBar.Location = new System.Drawing.Point(0, 241);
+            this.GameCompletionProgressBar.Location = new System.Drawing.Point(0, 251);
             this.GameCompletionProgressBar.Name = "GameCompletionProgressBar";
             this.GameCompletionProgressBar.Size = new System.Drawing.Size(304, 24);
             this.GameCompletionProgressBar.TabIndex = 1;
@@ -274,25 +286,25 @@
             this.GameOverLabel.Text = "GAME OVER";
             this.GameOverLabel.Visible = false;
             // 
-            // GAButton
+            // EvaluateFitnessButton
             // 
-            this.GAButton.Location = new System.Drawing.Point(170, 420);
-            this.GAButton.Name = "GAButton";
-            this.GAButton.Size = new System.Drawing.Size(103, 23);
-            this.GAButton.TabIndex = 21;
-            this.GAButton.Text = "Test GA";
-            this.GAButton.UseVisualStyleBackColor = true;
-            this.GAButton.Click += new System.EventHandler(this.GAButton_Click);
+            this.EvaluateFitnessButton.Location = new System.Drawing.Point(18, 443);
+            this.EvaluateFitnessButton.Name = "EvaluateFitnessButton";
+            this.EvaluateFitnessButton.Size = new System.Drawing.Size(103, 23);
+            this.EvaluateFitnessButton.TabIndex = 22;
+            this.EvaluateFitnessButton.Text = "EvaluateFitness";
+            this.EvaluateFitnessButton.UseVisualStyleBackColor = true;
+            this.EvaluateFitnessButton.Click += new System.EventHandler(this.EvaluateFitnessButton_Click);
             // 
-            // OthelloForm
+            // TestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(776, 449);
+            this.ClientSize = new System.Drawing.Size(776, 517);
             this.Controls.Add(this.ControlGroupBox);
             this.Controls.Add(this.GameOverLabel);
-            this.Name = "OthelloForm";
+            this.Name = "TestForm";
             this.Text = "Othello";
             this.Load += new System.EventHandler(this.OthelloForm_Load);
             this.ControlGroupBox.ResumeLayout(false);
@@ -325,6 +337,7 @@
         private System.Windows.Forms.Button MiniMaxTextButton;
         private System.Windows.Forms.Button GetSafePeiceButton;
         private System.Windows.Forms.Button GAButton;
+        private System.Windows.Forms.Button EvaluateFitnessButton;
     }
 }
 

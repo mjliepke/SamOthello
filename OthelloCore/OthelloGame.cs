@@ -1,12 +1,7 @@
-﻿using NumSharp.Extensions;
-using SamOthellop.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.NetworkInformation;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace SamOthellop.Model
 {
@@ -376,6 +371,69 @@ namespace SamOthellop.Model
             return cornerCount;
         }
     
+        public int GetOutside16PeiceCount(BoardStates player)
+        {//defined as in outer 2 rings
+            BoardStates[,] outside16mask = new BoardStates[8, 8] {
+                {player, player, player, player, player, player, player, player },
+                {player, player, player, player, player, player, player, player },
+                {player, player, 0, 0, 0, 0, player, player },
+                {player, player, 0, 0, 0, 0, player, player },
+                {player, player, 0, 0, 0, 0, player, player },
+                {player, player, 0, 0, 0, 0, player, player },
+                {player, player, player, player, player, player, player, player },
+                {player, player, player, player, player, player, player, player }};
+            int count = 0;
+
+            for(byte i=0;i<BOARD_SIZE; i++)
+            {
+                for(byte j =0;j<BOARD_SIZE; j++)
+                {
+                    if(Board[i,j] == outside16mask[i, j])
+                    {
+                        count++;
+                    }
+                }
+            }
+            return count;
+        }
+
+        public int GetFronteirDisks(BoardStates player)
+        {
+            //Defined as disks with >4 empty spots next to it
+            int count = 0;
+            for(byte i =0;i<BOARD_SIZE; i++)
+            {
+                for(byte j =0;j<BOARD_SIZE; j++)
+                {
+                    if(AdjEmptyCount(new byte[] { i, j }) > 4)
+                    {
+                        count++;
+                    }
+                }
+            }
+            return count;
+        }
+       
+        private int AdjEmptyCount(byte[] location)
+        {
+            int count = 0;
+            for(sbyte i=(sbyte)(location[0]-1); i<(sbyte)(location[0] + 1); i++)
+            {
+                for(sbyte j = (sbyte)(location[1] -1); j<(sbyte)(location[1] + 1); j++)
+                {
+                    if(j<0 || i < 0)
+                    { 
+                        continue;
+                    }
+                    else if(Board[i,j] == BoardStates.empty)
+                    {
+                        count++;
+                    }
+                }
+            }
+            return count;
+        }
+
     }
 }
 

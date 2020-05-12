@@ -32,7 +32,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -41,6 +41,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>true</RunCodeAnalysis>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>x64</PlatformTarget>
@@ -126,10 +127,9 @@
   <ItemGroup>
     <Compile Include="Model\Agents\AgentDictionary.cs" />
     <Compile Include="Model\Agents\GreedyAgent.cs" />
-    <Compile Include="Model\Agents\Heuristic\HeuristicAgent.cs" />
+    <Compile Include="Model\Agents\HeuristicAgent.cs" />
     <Compile Include="Model\Agents\IEvaluationAgent.cs" />
     <Compile Include="Model\Agents\RandomAgent.cs" />
-    <Compile Include="Model\IO\FileIO.cs" />
     <Compile Include="Model\Agents\Genetic\ChromosomeMutation.cs" />
     <Compile Include="Model\Agents\Genetic\EvaluationChromosome.cs" />
     <Compile Include="Model\Agents\Genetic\EvaluationFitness.cs" />
@@ -137,10 +137,7 @@
     <Compile Include="Model\Agents\IOthelloAgent.cs" />
     <Compile Include="Model\Agents\MinMaxAgent.cs" />
     <Compile Include="Model\Agents\NeuralNet\NeuralNet.cs" />
-    <Compile Include="Model\OthelloBoard.cs" />
-    <Compile Include="Model\OthelloGame.cs" />
     <Compile Include="Model\Tests.cs" />
-    <Compile Include="Model\IO\ThorGame.cs" />
     <Compile Include="View\ColorDictionary.cs" />
     <Compile Include="View\TestForm.cs">
       <SubType>Form</SubType>
@@ -165,6 +162,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="..\.editorconfig">
+      <Link>.editorconfig</Link>
+    </None>
     <None Include="Database\WTH_2001.wtb" />
     <None Include="Database\WTH_2002.wtb" />
     <None Include="Database\WTH_2003.wtb" />
@@ -217,7 +217,12 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\OthelloCore\OthelloCore.csproj">
+      <Project>{5d16757f-fb3f-40fb-84c0-ff59b2c966e0}</Project>
+      <Name>OthelloCore</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

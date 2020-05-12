@@ -181,7 +181,7 @@ namespace PlayAgents
             try
             {
                 PiecePanel thisPanel = (PiecePanel)sender;
-                if (_myGame.WhosTurn == _myPlayer)
+                if (_myGame.WhosTurn == _myPlayer && _myGame.ValidMove(_myPlayer, new byte[] { (byte)thisPanel.location[0], (byte)thisPanel.location[1] })) 
                 {
                     _myGame.MakeMove(_myPlayer, new byte[] { (byte)thisPanel.location[0], (byte)thisPanel.location[1] });
                     _myGame.MakeMove(_myAgent.MakeMove(_myGame, ~_myPlayer));

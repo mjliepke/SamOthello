@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using SamOthellop.Model.Agents;
+using SamOthellop.Model.Genetic;
+using GeneticSharp.Domain.Chromosomes;
+using System.IO;
 
 namespace SamOthellop.Model
 {
@@ -113,6 +116,27 @@ namespace SamOthellop.Model
             Console.WriteLine("Total should be about :" + 1010000);
         }
 
+        public static void TestNormalizeGenes(string path = @"E:\Source\SamOthellop\SamOthellop\Model\Agents\Genetic\5-11a\test4.dat")
+        {
+            double[] genes = File.ReadAllLines(path).Select(line => double.Parse(line)).ToArray();
+            double[] normalizedGenes = Evolution.NormalizeGenes(genes);
+            FloatingPointChromosome chromosome = new FloatingPointChromosome(
+                                                                  new double[] { -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100 },
+                                                                  new double[] { 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100 },
+                                                                  new int[] { 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64 },
+                                                                  new int[] { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }
+                                                                  genes);
+            FloatingPointChromosome normalizedChromosome = new FloatingPointChromosome(
+                                                                  new double[] { -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100 },
+                                                                  new double[] { 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100 },
+                                                                  new int[] { 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64 },
+                                                                  new int[] { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }
+                                                                  normalizedGenes);
+            Evolution.PrintChromosomeFitness(chromosome, new RandomAgent());
+            Evolution.PrintChromosomeFitness(chromosome, new MinMaxAgent(new GreedyAgent(), 2));
+            Evolution.PrintChromosomeFitness(normalizedChromosome, new MinMaxAgent(new GreedyAgent(), 2));
+            Evolution.PrintChromosomeFitness(normalizedChromosome, new RandomAgent());
+        }
 
     }
 }

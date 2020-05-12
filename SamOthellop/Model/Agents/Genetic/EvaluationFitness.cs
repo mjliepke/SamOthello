@@ -12,11 +12,19 @@ namespace SamOthellop.Model.Genetic
     public class EvaluationFitness : IFitness
     {
         int TEST_COUNT;
-        IOthelloAgent opposingAgent;
+        List<IOthelloAgent> opposingAgents;
+
         public EvaluationFitness(IOthelloAgent agent, int testCount = 100) : base()
         {
-            opposingAgent = agent;
+            opposingAgents.Add(agent);
             TEST_COUNT = testCount;
+        }
+
+        public EvaluationFitness(List<IOthelloAgent> agents, int testCount = 100) : base()
+        {
+            opposingAgents = agents;
+            TEST_COUNT = testCount;
+
         }
 
         public double Evaluate(IChromosome chromosome)
@@ -35,8 +43,10 @@ namespace SamOthellop.Model.Genetic
                 //Parallel.For(0, TEST_COUNT, new ParallelOptions() { MaxDegreeOfParallelism = 2},
                 //   (index) => {
                 BoardStates player =  (index % 2 == 0) ? BoardStates.black : BoardStates.white;
+                int opponentNumer = (index % opposingAgents.Count);
 
                 OthelloGame othelloGame = new OthelloGame();
+                IOthelloAgent opponentAgent = opposingAgents[opponentNumer];
                 IEvaluationAgent heurAgent = new HeuristicAgent(genes);
   
 
@@ -48,7 +58,7 @@ namespace SamOthellop.Model.Genetic
                     }
                     else
                     {
-                        othelloGame.MakeMove(opposingAgent.MakeMove(othelloGame, ~player));
+                        othelloGame.MakeMove(opponentAgent.MakeMove(othelloGame, ~player));
                     }
                 }
                 if (othelloGame.GameComplete)//just gotta check
