@@ -25,7 +25,7 @@ namespace SamOthellop.Model.Agents
         {
             try
             {
-                string[] strWeights = System.IO.File.ReadAllLines("bestchromosome.dat");
+                string[] strWeights = System.IO.File.ReadAllLines(@"E:\Source\SamOthellop\SamOthellop\Model\Agents\Genetic\bestchromosome.dat");
                 _weights = strWeights.Select((gene) => double.Parse(gene)).ToArray();
   
             }
@@ -35,6 +35,7 @@ namespace SamOthellop.Model.Agents
                 _weights = new double[] { 3, 75, -5, 0, 10, 100,0, 3, 75, -5, 0, 10, 100,0, 3, 75, -5, 0, 10, 100,0 };
             }
         }
+        
         public HeuristicAgent(double[] weights)
         {
             _weights = weights;

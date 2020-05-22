@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# CS0006: Metadata file 'E:\Source\SamOthellop\OthelloCore\bin\Debug\netstandard2.0\OthelloCore.dll' could not be found
+dotnet_diagnostic.CS0006.severity = suggestion

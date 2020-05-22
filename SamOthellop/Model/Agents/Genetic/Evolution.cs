@@ -26,12 +26,12 @@ namespace SamOthellop.Model.Genetic
         /// </summary>
         /// <param name="recursionDepth"></param>
 
-        private const string FOLDER_PATH = @"E:\Source\SamOthellop\SamOthellop\Model\Agents\Genetic\5-12b\";//path to save 
+        private const string FOLDER_PATH = @"E:\Source\SamOthellop\SamOthellop\Model\Agents\Genetic\5-16\";//path to save 
         private const int GENE_COUNT = 21;
         private const int MIN_GENE_VALUE = -100;
         private const int MAX_GENE_VALUE = 100;
 
-        public static void RunRecursiveGeneticAlgorithm(int recursionDepth = 10)
+        public static void RunRecursiveGeneticAlgorithm(int recursionDepth = 15)
         {
             //double[] priorGenes = LoadChromosome(@"E:\Source\SamOthellop\SamOthellop\Model\Agents\Genetic\bestchromosome5-10.dat");
 
@@ -44,7 +44,7 @@ namespace SamOthellop.Model.Genetic
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            for (int i = 0; i < recursionDepth; i++)
+            for (int i = 7; i < recursionDepth; i++)
             {
                 FloatingPointChromosome bestChm = firstChm;
                 if (i == 0)
